@@ -1,0 +1,60 @@
+[
+  { "artist": "Bauhaus", "title": "Bela Lugosi's Dead" },
+  { "artist": "Joy Division", "title": "Love Will Tear Us Apart" },
+  { "artist": "Siouxsie and the Banshees", "title": "Spellbound" },
+  { "artist": "The Sisters of Mercy", "title": "Lucretia My Reflection" },
+  { "artist": "Echo & the Bunnymen", "title": "The Killing Moon" },
+  { "artist": "Killing Joke", "title": "Eighties" },
+  { "artist": "Clan of Xymox", "title": "Stranger" },
+
+  { "artist": "Wu-Tang Clan", "title": "C.R.E.A.M." },
+  { "artist": "Nas", "title": "N.Y. State of Mind" },
+  { "artist": "MF DOOM", "title": "Doomsday" },
+  {
+    "artist": "Run the Jewels",
+    "title": "Close Your Eyes (And Count to Fuck)"
+  },
+  { "artist": "Little Simz", "title": "Offence" },
+  { "artist": "Earl Sweatshirt", "title": "Chum" },
+  { "artist": "billy woods", "title": "Spongebob" },
+  { "artist": "Mavi", "title": "Doves" },
+
+  { "artist": "Brian Eno", "title": "An Ending (Ascent)" },
+  { "artist": "Boards of Canada", "title": "Roygbiv" },
+  { "artist": "Aphex Twin", "title": "Avril 14th" },
+  { "artist": "Burial", "title": "Archangel" },
+  { "artist": "Tim Hecker", "title": "Hatred of Music" },
+  { "artist": "Loscil", "title": "Fault" },
+
+  { "artist": "Nick Drake", "title": "Pink Moon" },
+  { "artist": "Fleet Foxes", "title": "White Winter Hymnal" },
+  { "artist": "Bon Iver", "title": "Skinny Love" },
+  { "artist": "Big Thief", "title": "Shark Smile" },
+  { "artist": "Phoebe Bridgers", "title": "Motion Sickness" },
+  { "artist": "Anaïs Mitchell", "title": "Why We Build the Wall" },
+  { "artist": "Tomberlin", "title": "Seventeen" },
+  { "artist": "Adrianne Lenker", "title": "Anything" },
+
+  { "artist": "Black Sabbath", "title": "Paranoid" },
+  { "artist": "Metallica", "title": "Master of Puppets" },
+  { "artist": "Slayer", "title": "Raining Blood" },
+  { "artist": "Opeth", "title": "Ghost of Perdition" },
+  { "artist": "Mastodon", "title": "Blood and Thunder" },
+  { "artist": "Gojira", "title": "Flying Whales" },
+  { "artist": "Sumac", "title": "The Task" },
+  { "artist": "Cult of Luna", "title": "Cygnus" },
+
+  { "artist": "Carly Rae Jepsen", "title": "Call Me Maybe" },
+  { "artist": "Dua Lipa", "title": "Don't Start Now" },
+  { "artist": "Charli XCX", "title": "Boys" },
+  {
+    "artist": "Caroline Polachek",
+    "title": "So Hot You're Hurting My Feelings"
+  },
+  { "artist": "Rina Sawayama", "title": "XS" },
+  { "artist": "Magdalena Bay", "title": "Ghost" },
+
+  { "artist": "Florist", "title": "Shadow Bloom" },
+  { "artist": "Wishy", "title": "Spit" },
+  { "artist": "Greg Mendez", "title": "Freak" }
+]
