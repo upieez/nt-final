@@ -1,5 +1,7 @@
 const RECENCY_BASE = 0.6;
 const STRICTNESS_THRESHOLD = 0.7;
+// Artist tags describe a whole catalogue, so they count as weaker evidence than track tags
+const ARTIST_TAG_CONFIDENCE = 0.6;
 
 // Scale tag weights so each track's tags sum to 1
 function normaliseTags(tags) {
@@ -20,17 +22,18 @@ function buildSequenceTagSet(resolvedSeeds) {
   resolvedSeeds.forEach((seed, index) => {
     const positionsBack = n - 1 - index;
     const recencyWeight = Math.pow(RECENCY_BASE, positionsBack);
+    const confidence = seed.confidence ?? 1;
     const normalised = normaliseTags(seed.tags);
     if (positionsBack === 0) mostRecentTags = normalised;
     for (const [tag, weight] of normalised) {
-      sequenceTagWeights.set(tag, (sequenceTagWeights.get(tag) || 0) + weight * recencyWeight);
+      sequenceTagWeights.set(tag, (sequenceTagWeights.get(tag) || 0) + weight * recencyWeight * confidence);
     }
   });
   return { sequenceTagWeights, mostRecentTags };
 }
 
 // Raw score is the weighted overlap between candidate tags and the sequence tag set
-function scoreCandidate(candidateTags, sequenceTagWeights, mostRecentTags) {
+function scoreCandidate(candidateTags, sequenceTagWeights, mostRecentTags, candidateConfidence = 1) {
   const normalised = normaliseTags(candidateTags);
   let rawScore = 0;
   const matchedTags = [];
@@ -43,7 +46,7 @@ function scoreCandidate(candidateTags, sequenceTagWeights, mostRecentTags) {
     }
     if (mostRecentTags.has(tag)) overlapsMostRecent = true;
   }
-  return { rawScore, matchedTags, overlapsMostRecent };
+  return { rawScore: rawScore * candidateConfidence, matchedTags, overlapsMostRecent };
 }
 
 function normalisePopularity(listeners, maxListeners) {
@@ -68,6 +71,7 @@ function rankCandidates(scored) {
 module.exports = {
   RECENCY_BASE,
   STRICTNESS_THRESHOLD,
+  ARTIST_TAG_CONFIDENCE,
   normaliseTags,
   buildSequenceTagSet,
   scoreCandidate,

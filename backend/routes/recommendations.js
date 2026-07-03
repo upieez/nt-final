@@ -1,9 +1,10 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
-const { getTopTags, getTrackInfo } = require('../lib/lastfm');
+const { resolveTags, getTrackInfo } = require('../lib/lastfm');
 const {
   STRICTNESS_THRESHOLD,
+  ARTIST_TAG_CONFIDENCE,
   buildSequenceTagSet,
   scoreCandidate,
   applyDiscoveryPenalty,
@@ -39,17 +40,26 @@ router.post('/next-track', async (req, res) => {
 
   const warnings = [];
   const resolvedSeeds = [];
+  const seedTagSources = [];
+  let seedsUsingArtistTags = 0;
   for (const seed of sequence) {
-    const result = await getTopTags(seed.artist, seed.title);
+    const result = await resolveTags(seed.artist, seed.title);
     if (result.status === 'ok') {
-      resolvedSeeds.push({ track: seed, tags: result.tags });
+      const usedFallback = result.tagSource === 'artist';
+      if (usedFallback) {
+        seedsUsingArtistTags += 1;
+        warnings.push({ track: label(seed), issue: `track-level tags unavailable (${result.fallbackReason}); used artist-level tags at ${ARTIST_TAG_CONFIDENCE} confidence` });
+      }
+      resolvedSeeds.push({ track: seed, tags: result.tags, confidence: usedFallback ? ARTIST_TAG_CONFIDENCE : 1 });
+      seedTagSources.push({ track: label(seed), tagSource: result.tagSource });
     } else {
       const issue = {
         'not-found': 'artist/track not found on Last.fm',
         timeout: 'Last.fm request timed out',
-        'no-tags': 'no tags returned by Last.fm'
+        'no-tags': 'no tags at track or artist level on Last.fm'
       }[result.status] || result.message || 'Last.fm lookup failed';
       warnings.push({ track: label(seed), issue });
+      seedTagSources.push({ track: label(seed), tagSource: null });
     }
   }
 
@@ -64,8 +74,9 @@ router.post('/next-track', async (req, res) => {
   const scored = [];
   let candidatesScoreless = 0;
   let candidatesExcluded = 0;
+  let candidatesUsingArtistTags = 0;
   for (const candidate of pool) {
-    const tagResult = await getTopTags(candidate.artist, candidate.title);
+    const tagResult = await resolveTags(candidate.artist, candidate.title);
     if (tagResult.status === 'no-tags') {
       candidatesScoreless += 1;
       continue;
@@ -77,8 +88,12 @@ router.post('/next-track', async (req, res) => {
     }
     const info = await getTrackInfo(candidate.artist, candidate.title);
     const listeners = info.status === 'ok' ? info.listeners : 0;
-    const { rawScore, matchedTags, overlapsMostRecent } = scoreCandidate(tagResult.tags, sequenceTagWeights, mostRecentTags);
-    scored.push({ candidate, rawScore, matchedTags, listeners, overlapsMostRecent });
+    const usedFallback = tagResult.tagSource === 'artist';
+    if (usedFallback) candidatesUsingArtistTags += 1;
+    const { rawScore, matchedTags, overlapsMostRecent } = scoreCandidate(
+      tagResult.tags, sequenceTagWeights, mostRecentTags, usedFallback ? ARTIST_TAG_CONFIDENCE : 1
+    );
+    scored.push({ candidate, rawScore, matchedTags, listeners, overlapsMostRecent, tagSource: tagResult.tagSource });
   }
 
   let eligible = scored;
@@ -93,6 +108,7 @@ router.post('/next-track', async (req, res) => {
       candidatesConsidered: pool.length,
       candidatesScoreless,
       candidatesExcluded,
+      candidatesUsingArtistTags,
       warnings: warnings.length ? warnings : undefined
     });
   }
@@ -110,6 +126,10 @@ router.post('/next-track', async (req, res) => {
     score: Number(winner.adjustedScore.toFixed(4)),
     rawScore: Number(winner.rawScore.toFixed(4)),
     matchedTags: winner.matchedTags,
+    winnerTagSource: winner.tagSource,
+    seedTagSources,
+    seedsUsingArtistTags,
+    candidatesUsingArtistTags,
     recencyWeightApplied: resolvedSeeds.length > 1,
     candidatesConsidered: pool.length,
     candidatesScoreless,

@@ -111,7 +111,10 @@ function fmtResponse(result) {
     lines.push(`- matchedTags: ${b.matchedTags && b.matchedTags.length ? b.matchedTags.map((t) => `\`${t}\``).join(', ') : '(none)'}`);
     lines.push(`- recencyWeightApplied: \`${b.recencyWeightApplied}\``);
     lines.push(`- candidatesConsidered: \`${b.candidatesConsidered}\`  |  candidatesScoreless: \`${b.candidatesScoreless}\`  |  candidatesExcluded: \`${b.candidatesExcluded}\``);
-      } else if (b.error) {
+        if (b.winnerTagSource !== undefined) {
+      lines.push(`- winnerTagSource: \`${b.winnerTagSource}\`  |  seedsUsingArtistTags: \`${b.seedsUsingArtistTags}\`  |  candidatesUsingArtistTags: \`${b.candidatesUsingArtistTags}\``);
+    }
+  } else if (b.error) {
     lines.push(`- error: ${b.error}`);
     if (b.candidatesScoreless !== undefined) {
       lines.push(`- candidatesConsidered: \`${b.candidatesConsidered}\`  |  candidatesScoreless: \`${b.candidatesScoreless}\`  |  candidatesExcluded: \`${b.candidatesExcluded}\``);

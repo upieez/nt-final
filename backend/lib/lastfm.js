@@ -46,4 +46,31 @@ async function getTrackInfo(artist, title) {
   }
 }
 
-module.exports = { getTopTags, getTrackInfo };
+// Artist-level tags are the coverage backstop for the 54% no-tag rate seen at track level
+async function getArtistTopTags(artist) {
+  try {
+    const data = await callLastfm({ method: 'artist.gettoptags', artist });
+    if (data.error) {
+      if (data.error === 6) return { tags: null, status: 'not-found' };
+      return { tags: null, status: 'error', message: data.message };
+    }
+    const raw = Array.isArray(data.toptags?.tag) ? data.toptags.tag : [];
+    if (raw.length === 0) return { tags: [], status: 'no-tags' };
+    return { tags: raw.map((t) => ({ name: t.name, weight: Number(t.count) || 0 })), status: 'ok' };
+  } catch (err) {
+    return { tags: null, ...classifyError(err) };
+  }
+}
+
+// Track tags first, artist tags as fallback; tagSource records which level was used
+async function resolveTags(artist, title) {
+  const trackResult = await getTopTags(artist, title);
+  if (trackResult.status === 'ok') return { tags: trackResult.tags, status: 'ok', tagSource: 'track' };
+  const artistResult = await getArtistTopTags(artist);
+  if (artistResult.status === 'ok') {
+    return { tags: artistResult.tags, status: 'ok', tagSource: 'artist', fallbackReason: trackResult.status };
+  }
+  return { tags: trackResult.tags, status: trackResult.status, tagSource: null, message: trackResult.message, artistStatus: artistResult.status };
+}
+
+module.exports = { getTopTags, getArtistTopTags, resolveTags, getTrackInfo };
