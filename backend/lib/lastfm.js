@@ -1,65 +1,44 @@
-const axios = require('axios');
+const http = require('./http');
 
-const BASE_URL = 'https://ws.audioscrobbler.com/2.0/';
-const TIMEOUT_MS = 5000;
+const NOT_FOUND_CODE = 6;
 
+// Returns { status, body } where status is ok, not-found, offline-miss, timeout or error
 async function callLastfm(params) {
-  const response = await axios.get(BASE_URL, {
-    params: { ...params, api_key: process.env.LASTFM_API_KEY, format: 'json', autocorrect: 1 },
-    timeout: TIMEOUT_MS
+  const result = await http.request('lastfm', {
+    params: { ...params, format: 'json', autocorrect: 1 },
+    secretParams: { api_key: process.env.LASTFM_API_KEY }
   });
-  return response.data;
+  if (result.status !== 'ok') return { status: result.status, message: result.message, body: null };
+  const body = result.body || {};
+  if (body.error === NOT_FOUND_CODE) return { status: 'not-found', body: null };
+  if (body.error) return { status: 'error', message: body.message, body: null };
+  return { status: 'ok', body };
 }
 
-function classifyError(err) {
-  if (err.code === 'ECONNABORTED' || err.message?.includes('timeout')) return { status: 'timeout' };
-  return { status: 'error', message: err.message };
+function asArray(value) {
+  if (Array.isArray(value)) return value;
+  return value ? [value] : [];
 }
 
-// Returns { tags, status } where status is ok, no-tags, not-found, timeout or error
-async function getTopTags(artist, title) {
-  try {
-    const data = await callLastfm({ method: 'track.gettoptags', artist, track: title });
-    if (data.error) {
-      if (data.error === 6) return { tags: null, status: 'not-found' };
-      return { tags: null, status: 'error', message: data.message };
-    }
-    const raw = Array.isArray(data.toptags?.tag) ? data.toptags.tag : [];
-    if (raw.length === 0) return { tags: [], status: 'no-tags' };
-    return { tags: raw.map((t) => ({ name: t.name, weight: Number(t.count) || 0 })), status: 'ok' };
-  } catch (err) {
-    return { tags: null, ...classifyError(err) };
-  }
+function mapTags(raw) {
+  return raw.map((t) => ({ name: t.name, weight: Number(t.count) || 0 }));
 }
 
-// Listener count is the popularity signal for discoveryFactor and tie-breaks
-async function getTrackInfo(artist, title) {
-  try {
-    const data = await callLastfm({ method: 'track.getinfo', artist, track: title });
-    if (data.error) {
-      if (data.error === 6) return { listeners: null, status: 'not-found' };
-      return { listeners: null, status: 'error', message: data.message };
-    }
-    return { listeners: Number(data.track?.listeners) || 0, status: 'ok' };
-  } catch (err) {
-    return { listeners: null, ...classifyError(err) };
-  }
+async function fetchTags(params) {
+  const { status, message, body } = await callLastfm(params);
+  if (status !== 'ok') return { tags: null, status, message };
+  const raw = asArray(body.toptags?.tag);
+  if (raw.length === 0) return { tags: [], status: 'no-tags' };
+  return { tags: mapTags(raw), status: 'ok' };
+}
+
+function getTopTags(artist, title) {
+  return fetchTags({ method: 'track.gettoptags', artist, track: title });
 }
 
 // Artist-level tags are the coverage backstop for the 54% no-tag rate seen at track level
-async function getArtistTopTags(artist) {
-  try {
-    const data = await callLastfm({ method: 'artist.gettoptags', artist });
-    if (data.error) {
-      if (data.error === 6) return { tags: null, status: 'not-found' };
-      return { tags: null, status: 'error', message: data.message };
-    }
-    const raw = Array.isArray(data.toptags?.tag) ? data.toptags.tag : [];
-    if (raw.length === 0) return { tags: [], status: 'no-tags' };
-    return { tags: raw.map((t) => ({ name: t.name, weight: Number(t.count) || 0 })), status: 'ok' };
-  } catch (err) {
-    return { tags: null, ...classifyError(err) };
-  }
+function getArtistTopTags(artist) {
+  return fetchTags({ method: 'artist.gettoptags', artist });
 }
 
 // Track tags first, artist tags as fallback; tagSource records which level was used
@@ -73,4 +52,66 @@ async function resolveTags(artist, title) {
   return { tags: trackResult.tags, status: trackResult.status, tagSource: null, message: trackResult.message, artistStatus: artistResult.status };
 }
 
-module.exports = { getTopTags, getArtistTopTags, resolveTags, getTrackInfo };
+function emptyMbid(value) {
+  return typeof value === 'string' && value.length > 0 ? value : null;
+}
+
+// Autocorrected names and MBID hints feed reconciliation; listeners feed the popularity penalty
+async function getTrackInfo(artist, title) {
+  const { status, message, body } = await callLastfm({ method: 'track.getinfo', artist, track: title });
+  if (status !== 'ok') return { listeners: null, status, message };
+  const track = body.track || {};
+  return {
+    status: 'ok',
+    listeners: Number(track.listeners) || 0,
+    playcount: Number(track.playcount) || 0,
+    correctedArtist: track.artist?.name || artist,
+    correctedTitle: track.name || title,
+    mbid: emptyMbid(track.mbid),
+    artistMbid: emptyMbid(track.artist?.mbid)
+  };
+}
+
+function mapSimilarTrack(t) {
+  return { artist: t.artist?.name || '', title: t.name || '', match: Number(t.match) || 0, playcount: Number(t.playcount) || 0 };
+}
+
+async function getSimilarTracks(artist, title, limit = 20) {
+  const { status, message, body } = await callLastfm({ method: 'track.getsimilar', artist, track: title, limit });
+  if (status !== 'ok') return { tracks: null, status, message };
+  return { tracks: asArray(body.similartracks?.track).map(mapSimilarTrack).filter((t) => t.artist && t.title), status: 'ok' };
+}
+
+async function getSimilarArtists(artist, limit = 5) {
+  const { status, message, body } = await callLastfm({ method: 'artist.getsimilar', artist, limit });
+  if (status !== 'ok') return { artists: null, status, message };
+  return { artists: asArray(body.similarartists?.artist).map((a) => ({ name: a.name, match: Number(a.match) || 0 })), status: 'ok' };
+}
+
+function mapTopTrack(t) {
+  return { artist: t.artist?.name || '', title: t.name || '', listeners: Number(t.listeners) || 0, playcount: Number(t.playcount) || 0 };
+}
+
+async function getArtistTopTracks(artist, limit = 5) {
+  const { status, message, body } = await callLastfm({ method: 'artist.gettoptracks', artist, limit });
+  if (status !== 'ok') return { tracks: null, status, message };
+  return { tracks: asArray(body.toptracks?.track).map(mapTopTrack).filter((t) => t.artist && t.title), status: 'ok' };
+}
+
+async function searchTracks(query, limit = 8) {
+  const { status, message, body } = await callLastfm({ method: 'track.search', track: query, limit });
+  if (status !== 'ok') return { results: null, status, message };
+  const raw = asArray(body.results?.trackmatches?.track);
+  return { results: raw.map((t) => ({ artist: t.artist, title: t.name, listeners: Number(t.listeners) || 0 })), status: 'ok' };
+}
+
+module.exports = {
+  getTopTags,
+  getArtistTopTags,
+  resolveTags,
+  getTrackInfo,
+  getSimilarTracks,
+  getSimilarArtists,
+  getArtistTopTracks,
+  searchTracks
+};
