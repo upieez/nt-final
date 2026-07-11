@@ -4,11 +4,17 @@
   "description": "NextTrack: stateless next-track recommendation API",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "jest --runInBand"
   },
   "dependencies": {
     "axios": "^1.7.7",
     "dotenv": "^16.4.5",
     "express": "^4.21.1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nock": "^13.5.6",
+    "supertest": "^7.2.2"
   }
 }

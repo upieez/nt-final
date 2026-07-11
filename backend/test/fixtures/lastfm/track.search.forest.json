@@ -1,0 +1,16 @@
+{
+  "results": {
+    "opensearch:Query": { "#text": "", "role": "request", "startPage": "1" },
+    "opensearch:totalResults": "20301",
+    "opensearch:startIndex": "0",
+    "opensearch:itemsPerPage": "8",
+    "trackmatches": {
+      "track": [
+        { "name": "A Forest", "artist": "The Cure", "url": "https://www.last.fm/music/The+Cure/_/A+Forest", "streamable": "FIXME", "listeners": "812345", "image": [], "mbid": "" },
+        { "name": "Forest", "artist": "System of a Down", "url": "https://www.last.fm/music/System+of+a+Down/_/Forest", "streamable": "FIXME", "listeners": "601122", "image": [], "mbid": "" },
+        { "name": "Black Forest", "artist": "Sam Fender", "url": "https://www.last.fm/music/Sam+Fender/_/Black+Forest", "streamable": "FIXME", "listeners": "40311", "image": [], "mbid": "" }
+      ]
+    },
+    "@attr": {}
+  }
+}

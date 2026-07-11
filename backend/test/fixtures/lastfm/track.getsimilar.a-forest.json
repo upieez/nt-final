@@ -1,0 +1,37 @@
+{
+  "similartracks": {
+    "track": [
+      {
+        "name": "Disorder",
+        "playcount": 4123456,
+        "mbid": "",
+        "match": 1,
+        "url": "https://www.last.fm/music/Joy+Division/_/Disorder",
+        "streamable": { "#text": "0", "fulltrack": "0" },
+        "duration": 208,
+        "artist": { "name": "Joy Division", "mbid": "9a58fda3-f4ed-4080-a3a5-f457aac9fcdd", "url": "https://www.last.fm/music/Joy+Division" }
+      },
+      {
+        "name": "Bela Lugosi's Dead",
+        "playcount": 2210983,
+        "mbid": "",
+        "match": 0.91,
+        "url": "https://www.last.fm/music/Bauhaus/_/Bela+Lugosi%27s+Dead",
+        "streamable": { "#text": "0", "fulltrack": "0" },
+        "duration": 562,
+        "artist": { "name": "Bauhaus", "mbid": "a1fbb7dc-2f5c-4d33-bd75-98c06b3c2db4", "url": "https://www.last.fm/music/Bauhaus" }
+      },
+      {
+        "name": "Spellbound",
+        "playcount": 1650021,
+        "mbid": "",
+        "match": 0.84,
+        "url": "https://www.last.fm/music/Siouxsie+and+the+Banshees/_/Spellbound",
+        "streamable": { "#text": "0", "fulltrack": "0" },
+        "duration": 196,
+        "artist": { "name": "Siouxsie and the Banshees", "mbid": "5e1c45e0-3e8f-4b62-a1d0-19cd5d2f2d0a", "url": "https://www.last.fm/music/Siouxsie+and+the+Banshees" }
+      }
+    ],
+    "@attr": { "artist": "The Cure" }
+  }
+}
