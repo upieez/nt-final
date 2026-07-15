@@ -1,0 +1,32 @@
+{
+  "id": "3f0e5b2a-6a51-4a4e-9d3c-0d2f7b1f4c88",
+  "title": "A Forest",
+  "length": 354000,
+  "disambiguation": "",
+  "video": false,
+  "first-release-date": "1980-04-18",
+  "artist-credit": [
+    {
+      "name": "The Cure",
+      "joinphrase": "",
+      "artist": {
+        "id": "69ee3720-a7cb-4402-b48d-a02c366f2bcf",
+        "name": "The Cure",
+        "sort-name": "Cure, The",
+        "type": "Group",
+        "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+        "disambiguation": ""
+      }
+    }
+  ],
+  "isrcs": ["GBAAA8000123", "GBAAA0500456"],
+  "genres": [
+    { "id": "7f8a3f31-7a0c-4c8c-9d3e-2d9d3f1b2a10", "name": "post-punk", "count": 4, "disambiguation": "" },
+    { "id": "5c7e2b1d-4a1f-4b2c-8e9d-6a5b4c3d2e1f", "name": "gothic rock", "count": 2, "disambiguation": "" }
+  ],
+  "tags": [
+    { "count": 4, "name": "post-punk" },
+    { "count": 2, "name": "gothic rock" },
+    { "count": 1, "name": "new wave" }
+  ]
+}

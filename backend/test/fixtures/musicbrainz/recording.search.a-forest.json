@@ -1,0 +1,57 @@
+{
+  "created": "2026-07-14T12:03:11.482Z",
+  "count": 214,
+  "offset": 0,
+  "recordings": [
+    {
+      "id": "3f0e5b2a-6a51-4a4e-9d3c-0d2f7b1f4c88",
+      "score": 100,
+      "title": "A Forest",
+      "length": 354000,
+      "video": null,
+      "artist-credit": [
+        {
+          "name": "The Cure",
+          "artist": {
+            "id": "69ee3720-a7cb-4402-b48d-a02c366f2bcf",
+            "name": "The Cure",
+            "sort-name": "Cure, The",
+            "disambiguation": ""
+          }
+        }
+      ],
+      "releases": [
+        {
+          "id": "b6a1d4e1-53d0-4c39-9d7f-2f1d8b0c1a11",
+          "title": "Seventeen Seconds",
+          "status": "Official",
+          "date": "1980-04-18",
+          "country": "GB"
+        }
+      ],
+      "isrcs": ["GBAAA8000123"],
+      "tags": [{ "count": 2, "name": "post-punk" }]
+    },
+    {
+      "id": "8c2a7e64-6d3d-4c2f-b6ad-4f2f5a0c9e21",
+      "score": 88,
+      "title": "A Forest (live)",
+      "length": 402000,
+      "video": null,
+      "artist-credit": [
+        {
+          "name": "The Cure",
+          "artist": {
+            "id": "69ee3720-a7cb-4402-b48d-a02c366f2bcf",
+            "name": "The Cure",
+            "sort-name": "Cure, The",
+            "disambiguation": ""
+          }
+        }
+      ],
+      "releases": [
+        { "id": "0b3b8f1a-1c1e-4a4b-8c9d-3a1f2e5d6c70", "title": "Paris", "status": "Official", "date": "1993-10-26", "country": "GB" }
+      ]
+    }
+  ]
+}
