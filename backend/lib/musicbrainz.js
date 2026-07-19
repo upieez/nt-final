@@ -58,4 +58,30 @@ async function getRecordingsByIsrc(isrc) {
   return { recordings: (body.recordings || []).map(mapRecording), status: 'ok' };
 }
 
-module.exports = { searchRecording, getRecording, getRecordingsByIsrc, luceneQuote };
+function wikidataIdFromRelations(relations) {
+  for (const rel of Array.isArray(relations) ? relations : []) {
+    const match = WIKIDATA_URL.exec(rel.url?.resource || '');
+    if (rel.type === 'wikidata' && match) return match[1];
+  }
+  return null;
+}
+
+// Artist genres, country and the Wikidata link that unlocks the graph signal
+async function getArtist(mbid) {
+  const { status, message, body } = await callMusicbrainz(`artist/${mbid}`, { inc: 'genres+tags+url-rels' });
+  if (status !== 'ok') return { artist: null, status, message };
+  return {
+    status: 'ok',
+    artist: {
+      mbid: body.id,
+      name: body.name,
+      type: body.type || null,
+      country: body.country || null,
+      genres: namedList(body.genres),
+      tags: namedList(body.tags),
+      wikidataId: wikidataIdFromRelations(body.relations)
+    }
+  };
+}
+
+module.exports = { searchRecording, getRecording, getRecordingsByIsrc, getArtist, luceneQuote, wikidataIdFromRelations };

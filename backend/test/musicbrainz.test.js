@@ -42,4 +42,31 @@ describe('musicbrainz client', () => {
     expect(result.recording.genres.map((g) => g.name)).toEqual(['post-punk', 'gothic rock']);
     expect(result.recording.artistMbid).toBe('69ee3720-a7cb-4402-b48d-a02c366f2bcf');
   });
+
+  test('artist lookup extracts genres, country and the Wikidata QID from url-rels', async () => {
+    const scope = mock('/ws/2/artist/69ee3720-a7cb-4402-b48d-a02c366f2bcf', { inc: 'genres+tags+url-rels' }, 'musicbrainz/artist.lookup.the-cure.json');
+    const result = await mb.getArtist('69ee3720-a7cb-4402-b48d-a02c366f2bcf');
+    expect(scope.isDone()).toBe(true);
+    expect(result.artist).toMatchObject({ name: 'The Cure', country: 'GB', type: 'Group', wikidataId: 'Q152459' });
+    expect(result.artist.genres[0]).toEqual({ name: 'post-punk', count: 14 });
+  });
+
+  test('artist without a Wikidata relation yields wikidataId null', async () => {
+    mock('/ws/2/artist/c0c9e8d7-1f2a-4b3c-9d4e-5f6a7b8c9d0e', {}, 'musicbrainz/artist.lookup.no-wikidata.json');
+    const result = await mb.getArtist('c0c9e8d7-1f2a-4b3c-9d4e-5f6a7b8c9d0e');
+    expect(result.artist.wikidataId).toBeNull();
+    expect(result.artist.genres).toEqual([]);
+  });
+
+  test('a 404 lookup reports not-found', async () => {
+    mock('/ws/2/artist/missing', {}, 'musicbrainz/error.not-found.json', 404);
+    const result = await mb.getArtist('missing');
+    expect(result.status).toBe('not-found');
+  });
+
+  test('a 503 reports error', async () => {
+    mock('/ws/2/artist/busy', {}, { error: 'Service unavailable' }, 503);
+    const result = await mb.getArtist('busy');
+    expect(result.status).toBe('error');
+  });
 });

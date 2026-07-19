@@ -1,0 +1,77 @@
+{
+  "id": "69ee3720-a7cb-4402-b48d-a02c366f2bcf",
+  "name": "The Cure",
+  "sort-name": "Cure, The",
+  "type": "Group",
+  "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+  "gender": null,
+  "gender-id": null,
+  "disambiguation": "",
+  "country": "GB",
+  "area": { "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed", "name": "United Kingdom", "sort-name": "United Kingdom", "type": "Country", "iso-3166-1-codes": ["GB"] },
+  "begin-area": { "id": "b2c9c4e5-7f7b-4f3a-9c50-6d6b9a7c2b0e", "name": "Crawley", "sort-name": "Crawley", "type": "City" },
+  "end-area": null,
+  "life-span": { "begin": "1976", "end": null, "ended": false },
+  "isnis": ["0000000122803130"],
+  "ipis": [],
+  "genres": [
+    { "id": "7f8a3f31-7a0c-4c8c-9d3e-2d9d3f1b2a10", "name": "post-punk", "count": 14, "disambiguation": "" },
+    { "id": "5c7e2b1d-4a1f-4b2c-8e9d-6a5b4c3d2e1f", "name": "gothic rock", "count": 11, "disambiguation": "" },
+    { "id": "9d1c8b2a-3e4f-4a5b-8c6d-7e8f9a0b1c2d", "name": "new wave", "count": 9, "disambiguation": "" },
+    { "id": "1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d", "name": "alternative rock", "count": 6, "disambiguation": "" }
+  ],
+  "tags": [
+    { "count": 14, "name": "post-punk" },
+    { "count": 11, "name": "gothic rock" },
+    { "count": 9, "name": "new wave" },
+    { "count": 6, "name": "alternative rock" },
+    { "count": 3, "name": "british" }
+  ],
+  "relations": [
+    {
+      "type": "wikidata",
+      "type-id": "689870a4-a1e4-4912-b17f-7b2664215698",
+      "direction": "forward",
+      "target-type": "url",
+      "ended": false,
+      "attributes": [],
+      "attribute-values": {},
+      "attribute-ids": {},
+      "begin": null,
+      "end": null,
+      "source-credit": "",
+      "target-credit": "",
+      "url": { "id": "2d3a4b5c-6d7e-4f8a-9b0c-1d2e3f4a5b6c", "resource": "https://www.wikidata.org/wiki/Q152459" }
+    },
+    {
+      "type": "official homepage",
+      "type-id": "fe33d22f-c3b0-4d68-bd53-a856badf2ebc",
+      "direction": "forward",
+      "target-type": "url",
+      "ended": false,
+      "attributes": [],
+      "attribute-values": {},
+      "attribute-ids": {},
+      "begin": null,
+      "end": null,
+      "source-credit": "",
+      "target-credit": "",
+      "url": { "id": "3e4f5a6b-7c8d-4e9f-a0b1-c2d3e4f5a6b7", "resource": "https://www.thecure.com/" }
+    },
+    {
+      "type": "discogs",
+      "type-id": "04a5b104-a4c2-4bac-99a1-7b837c37d9e4",
+      "direction": "forward",
+      "target-type": "url",
+      "ended": false,
+      "attributes": [],
+      "attribute-values": {},
+      "attribute-ids": {},
+      "begin": null,
+      "end": null,
+      "source-credit": "",
+      "target-credit": "",
+      "url": { "id": "4f5a6b7c-8d9e-4f0a-b1c2-d3e4f5a6b7c8", "resource": "https://www.discogs.com/artist/29735" }
+    }
+  ]
+}
