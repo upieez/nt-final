@@ -1,0 +1,162 @@
+{
+  "head": {
+    "vars": [
+      "prop",
+      "value",
+      "valueLabel"
+    ]
+  },
+  "results": {
+    "bindings": [
+      {
+        "prop": {
+          "type": "uri",
+          "value": "http://www.wikidata.org/prop/direct/P136"
+        },
+        "value": {
+          "type": "uri",
+          "value": "http://www.wikidata.org/entity/Q3071"
+        },
+        "valueLabel": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "post-punk"
+        }
+      },
+      {
+        "prop": {
+          "type": "uri",
+          "value": "http://www.wikidata.org/prop/direct/P136"
+        },
+        "value": {
+          "type": "uri",
+          "value": "http://www.wikidata.org/entity/Q217467"
+        },
+        "valueLabel": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "gothic rock"
+        }
+      },
+      {
+        "prop": {
+          "type": "uri",
+          "value": "http://www.wikidata.org/prop/direct/P136"
+        },
+        "value": {
+          "type": "uri",
+          "value": "http://www.wikidata.org/entity/Q3071"
+        },
+        "valueLabel": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "post-punk"
+        }
+      },
+      {
+        "prop": {
+          "type": "uri",
+          "value": "http://www.wikidata.org/prop/direct/P264"
+        },
+        "value": {
+          "type": "uri",
+          "value": "http://www.wikidata.org/entity/Q1131303"
+        },
+        "valueLabel": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "Fiction Records"
+        }
+      },
+      {
+        "prop": {
+          "type": "uri",
+          "value": "http://www.wikidata.org/prop/direct/P264"
+        },
+        "value": {
+          "type": "uri",
+          "value": "http://www.wikidata.org/entity/Q212699"
+        },
+        "valueLabel": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "Polydor Records"
+        }
+      },
+      {
+        "prop": {
+          "type": "uri",
+          "value": "http://www.wikidata.org/prop/direct/P264"
+        },
+        "value": {
+          "type": "uri",
+          "value": "http://www.wikidata.org/entity/Q99999999"
+        },
+        "valueLabel": {
+          "type": "literal",
+          "value": "Q99999999"
+        }
+      },
+      {
+        "prop": {
+          "type": "uri",
+          "value": "http://www.wikidata.org/prop/direct/P495"
+        },
+        "value": {
+          "type": "uri",
+          "value": "http://www.wikidata.org/entity/Q145"
+        },
+        "valueLabel": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "United Kingdom"
+        }
+      },
+      {
+        "prop": {
+          "type": "uri",
+          "value": "http://www.wikidata.org/prop/direct/P527"
+        },
+        "value": {
+          "type": "uri",
+          "value": "http://www.wikidata.org/entity/Q313040"
+        },
+        "valueLabel": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "Robert Smith"
+        }
+      },
+      {
+        "prop": {
+          "type": "uri",
+          "value": "http://www.wikidata.org/prop/direct/P527"
+        },
+        "value": {
+          "type": "uri",
+          "value": "http://www.wikidata.org/entity/Q1391733"
+        },
+        "valueLabel": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "Simon Gallup"
+        }
+      },
+      {
+        "prop": {
+          "type": "uri",
+          "value": "http://www.wikidata.org/prop/direct/P527"
+        },
+        "value": {
+          "type": "uri",
+          "value": "http://www.wikidata.org/entity/Q3178718"
+        },
+        "valueLabel": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "Lol Tolhurst"
+        }
+      }
+    ]
+  }
+}
