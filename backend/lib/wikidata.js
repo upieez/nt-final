@@ -3,6 +3,7 @@ const http = require('./http');
 // Direct-claim properties fetched for an artist entity, one SPARQL round trip per artist
 const PROPERTIES = { P136: 'genres', P264: 'labels', P495: 'country', P527: 'members', P463: 'memberOf' };
 const ENTITY_PREFIX = 'http://www.wikidata.org/entity/';
+const MUSICBRAINZ_ARTIST_ID = 'P434';
 
 async function sparql(query) {
   const result = await http.request('wikidata', { params: { query, format: 'json' } });
@@ -62,4 +63,13 @@ async function getArtistRelations(qid) {
   return { status: 'ok', relations: fold(qid, bindings) };
 }
 
-module.exports = { getArtistRelations, relationsQuery, PROPERTIES };
+// Fallback when MusicBrainz has no Wikidata url-rel: Wikidata stores the MBID as P434
+async function findArtistByMbid(mbid) {
+  const query = `SELECT ?item WHERE { ?item wdt:${MUSICBRAINZ_ARTIST_ID} "${String(mbid).replace(/["\\]/g, '')}" } LIMIT 1`;
+  const { status, message, bindings } = await sparql(query);
+  if (status !== 'ok') return { status, message, qid: null };
+  const qid = bindings.length ? entityId(bindings[0].item?.value) : null;
+  return { status: qid ? 'ok' : 'not-found', qid };
+}
+
+module.exports = { getArtistRelations, findArtistByMbid, relationsQuery, PROPERTIES };

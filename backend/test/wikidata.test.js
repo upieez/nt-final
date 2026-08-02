@@ -41,6 +41,19 @@ describe('wikidata client', () => {
     expect(result.status).toBe('error');
   });
 
+  test('finds an artist QID from a MusicBrainz id via P434', async () => {
+    const scope = mock('wdt:P434 "69ee3720-a7cb-4402-b48d-a02c366f2bcf"', 'wikidata/mbid.the-cure.json');
+    const result = await wikidata.findArtistByMbid('69ee3720-a7cb-4402-b48d-a02c366f2bcf');
+    expect(scope.isDone()).toBe(true);
+    expect(result).toEqual({ status: 'ok', qid: 'Q152459' });
+  });
+
+  test('reports not-found when no entity carries the MBID', async () => {
+    mock('wdt:P434', 'wikidata/mbid.empty.json');
+    const result = await wikidata.findArtistByMbid('00000000-0000-0000-0000-000000000000');
+    expect(result).toEqual({ status: 'not-found', qid: null });
+  });
+
   test('a query service 5xx is reported as error', async () => {
     mock('wd:Q152459', { message: 'overloaded' }, 503);
     const result = await wikidata.getArtistRelations('Q152459');
