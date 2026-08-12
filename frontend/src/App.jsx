@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import Header from './components/Header.jsx';
+import SeedBuilder from './components/SeedBuilder.jsx';
+import { addTrack, moveTrack, removeTrack } from './lib/sequence.js';
 
 const VIEWS = [
   { id: 'recommend', label: 'Recommend', hash: '#/' },
@@ -12,6 +14,7 @@ function viewFromHash() {
 
 export default function App() {
   const [view, setView] = useState(viewFromHash);
+  const [sequence, setSequence] = useState([]);
 
   useEffect(() => {
     const onHashChange = () => setView(viewFromHash());
@@ -19,12 +22,20 @@ export default function App() {
     return () => window.removeEventListener('hashchange', onHashChange);
   }, []);
 
+  const seedProps = {
+    sequence,
+    onAdd: (track) => setSequence((s) => addTrack(s, track)),
+    onMove: (i, dir) => setSequence((s) => moveTrack(s, i, dir)),
+    onRemove: (i) => setSequence((s) => removeTrack(s, i)),
+    onClear: () => setSequence([])
+  };
+
   return (
     <div className="app">
       <Header views={VIEWS} activeView={view} />
       <main id="main" className="main">
         {view === 'recommend' ? (
-          <p className="muted">Seed builder coming next.</p>
+          <SeedBuilder {...seedProps} />
         ) : (
           <p className="muted">Rating study coming next.</p>
         )}
