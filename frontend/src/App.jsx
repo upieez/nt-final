@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import Header from './components/Header.jsx';
 import SeedBuilder from './components/SeedBuilder.jsx';
+import PreferencesPanel from './components/PreferencesPanel.jsx';
 import { addTrack, moveTrack, removeTrack } from './lib/sequence.js';
+import { DEFAULT_OPTIONS, DEFAULT_PREFERENCES } from './lib/preferences.js';
 
 const VIEWS = [
   { id: 'recommend', label: 'Recommend', hash: '#/' },
@@ -15,6 +17,8 @@ function viewFromHash() {
 export default function App() {
   const [view, setView] = useState(viewFromHash);
   const [sequence, setSequence] = useState([]);
+  const [preferences, setPreferences] = useState(DEFAULT_PREFERENCES);
+  const [options, setOptions] = useState(DEFAULT_OPTIONS);
 
   useEffect(() => {
     const onHashChange = () => setView(viewFromHash());
@@ -35,7 +39,11 @@ export default function App() {
       <Header views={VIEWS} activeView={view} />
       <main id="main" className="main">
         {view === 'recommend' ? (
-          <SeedBuilder {...seedProps} />
+          <>
+            <SeedBuilder {...seedProps} />
+            <PreferencesPanel preferences={preferences} options={options}
+              onChange={setPreferences} onOptionsChange={setOptions} />
+          </>
         ) : (
           <p className="muted">Rating study coming next.</p>
         )}
