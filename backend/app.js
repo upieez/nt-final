@@ -2,12 +2,14 @@ const express = require('express');
 const http = require('./lib/http');
 const { ApiError } = require('./lib/errors');
 const recommendationsRouter = require('./routes/recommendations');
+const tracksRouter = require('./routes/tracks');
 
 const app = express();
 app.use(express.json());
 
 app.get('/health', (req, res) => res.json({ status: 'ok', offline: http.isOffline() }));
 app.use('/api/v1/recommendations', recommendationsRouter);
+app.use('/api/v1/tracks', tracksRouter);
 
 app.use((req, res) => res.status(404).json({ error: 'Not found' }));
 
