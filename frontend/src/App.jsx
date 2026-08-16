@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
 import Header from './components/Header.jsx';
-import SeedBuilder from './components/SeedBuilder.jsx';
-import PreferencesPanel from './components/PreferencesPanel.jsx';
-import { addTrack, moveTrack, removeTrack } from './lib/sequence.js';
+import RecommendView from './components/RecommendView.jsx';
 import { DEFAULT_OPTIONS, DEFAULT_PREFERENCES } from './lib/preferences.js';
 
 const VIEWS = [
@@ -26,24 +24,14 @@ export default function App() {
     return () => window.removeEventListener('hashchange', onHashChange);
   }, []);
 
-  const seedProps = {
-    sequence,
-    onAdd: (track) => setSequence((s) => addTrack(s, track)),
-    onMove: (i, dir) => setSequence((s) => moveTrack(s, i, dir)),
-    onRemove: (i) => setSequence((s) => removeTrack(s, i)),
-    onClear: () => setSequence([])
-  };
+  const shared = { sequence, setSequence, preferences, setPreferences, options, setOptions };
 
   return (
     <div className="app">
       <Header views={VIEWS} activeView={view} />
       <main id="main" className="main">
         {view === 'recommend' ? (
-          <>
-            <SeedBuilder {...seedProps} />
-            <PreferencesPanel preferences={preferences} options={options}
-              onChange={setPreferences} onOptionsChange={setOptions} />
-          </>
+          <RecommendView {...shared} />
         ) : (
           <p className="muted">Rating study coming next.</p>
         )}
