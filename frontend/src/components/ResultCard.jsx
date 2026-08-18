@@ -1,4 +1,5 @@
 import ScoreBreakdown from './ScoreBreakdown.jsx';
+import YouTubePlayer from './YouTubePlayer.jsx';
 
 function TagList({ label, items }) {
   if (!items || items.length === 0) return null;
@@ -31,6 +32,8 @@ export default function ResultCard({ result, onUseAsSeed }) {
           Add to my sequence and continue
         </button>
       </div>
+
+      <YouTubePlayer track={recommendation} />
 
       <TagList label="Matched tags" items={explanation.matchedTags} />
       <TagList label="Matched genres" items={explanation.matchedGenres} />
