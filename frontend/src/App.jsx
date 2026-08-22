@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import Header from './components/Header.jsx';
 import RecommendView from './components/RecommendView.jsx';
+import StudyView from './components/StudyView.jsx';
 import { DEFAULT_OPTIONS, DEFAULT_PREFERENCES } from './lib/preferences.js';
 
 const VIEWS = [
@@ -33,7 +34,7 @@ export default function App() {
         {view === 'recommend' ? (
           <RecommendView {...shared} />
         ) : (
-          <p className="muted">Rating study coming next.</p>
+          <StudyView sequence={sequence} preferences={preferences} />
         )}
       </main>
       <footer className="footer">
