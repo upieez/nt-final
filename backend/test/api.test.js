@@ -179,6 +179,21 @@ describe('POST /api/v1/recommendations/next-track', () => {
     expect(res.body.candidatePool.excluded).toBe(2);
   });
 
+  test('offline mode serves a warmed request from the snapshot and reports misses without calling out', async () => {
+    world.install();
+    await post({ sequence: SEQUENCE });
+    nock.cleanAll();
+    process.env.NEXTTRACK_OFFLINE = '1';
+    const warm = await post({ sequence: SEQUENCE });
+    const cold = await post({ sequence: [{ artist: 'Unknown', title: 'Thing' }] });
+    delete process.env.NEXTTRACK_OFFLINE;
+    expect(warm.status).toBe(200);
+    expect(warm.body.recommendation.title).toBe('Spellbound');
+    expect(warm.body.diagnostics.upstreamCalls).toBe(0);
+    expect(cold.status).toBe(422);
+    expect(cold.body.warnings[0]).toEqual({ track: 'Unknown - Thing', issue: 'not in the offline cache' });
+  });
+
   test('unknown routes are a JSON 404', async () => {
     const res = await request(app).get('/api/v1/nothing');
     expect(res.status).toBe(404);
