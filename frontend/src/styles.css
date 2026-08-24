@@ -736,3 +736,28 @@ select.input {
 .preset-option input {
   margin-top: 0.35rem;
 }
+
+.health {
+  display: inline-block;
+  margin-left: var(--space-2);
+  padding: 0 var(--space-2);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+.health-up {
+  color: var(--ok);
+  border-color: var(--ok);
+}
+
+.health-offline {
+  color: var(--focus);
+  border-color: var(--focus);
+}
+
+.health-down {
+  color: var(--danger);
+  border-color: var(--danger);
+}

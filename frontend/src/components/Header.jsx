@@ -1,3 +1,5 @@
+import HealthBadge from './HealthBadge.jsx';
+
 export default function Header({ views, activeView }) {
   return (
     <header className="header">
@@ -22,7 +24,7 @@ export default function Header({ views, activeView }) {
       </div>
       <p className="header-note">
         No account, no listening history. Each recommendation is computed only from the tracks and
-        preferences you send in that one request.
+        preferences you send in that one request. <HealthBadge />
       </p>
     </header>
   );
