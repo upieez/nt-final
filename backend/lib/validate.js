@@ -79,4 +79,4 @@ function validateBaselineRequest(body) {
   return { sequence, strategy, options, preferences: validatePreferences(source.preferences, []) };
 }
 
-module.exports = { validateRecommendationRequest, validateBaselineRequest, clamp01, MAX_SEQUENCE };
+module.exports = { validateRecommendationRequest, validateBaselineRequest };

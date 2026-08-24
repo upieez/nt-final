@@ -121,4 +121,4 @@ function install(overrides = {}) {
   nock('https://query.wikidata.org').persist().get('/sparql').query(true).reply((uri) => [200, wikidataReply(new URL(uri, 'https://x').searchParams.get('query'))]);
 }
 
-module.exports = { install, ARTISTS, TRACKS, SIMILAR_TRACKS, NOT_FOUND };
+module.exports = { install, ARTISTS, TRACKS, NOT_FOUND };

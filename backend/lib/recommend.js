@@ -3,7 +3,7 @@ const lastfm = require('./lastfm');
 const scoring = require('./scoring');
 const { resolveTrack, matchRate } = require('./reconcile');
 const { buildPool } = require('./candidates');
-const { resolveSeeds, seedSummary, failureError, label } = require('./seeds');
+const { resolveSeeds, seedSummary, failureError } = require('./seeds');
 const { buildSummary, topTagNames } = require('./explain');
 const { unresolvableError } = require('./errors');
 
@@ -196,4 +196,4 @@ async function recommend(request) {
   return { ...body, diagnostics: diagnosticsFrom(stats, startedAt, skipped) };
 }
 
-module.exports = { recommend, diagnosticsFrom, label };
+module.exports = { recommend, diagnosticsFrom };

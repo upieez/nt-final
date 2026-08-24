@@ -72,4 +72,4 @@ async function findArtistByMbid(mbid) {
   return { status: qid ? 'ok' : 'not-found', qid };
 }
 
-module.exports = { getArtistRelations, findArtistByMbid, relationsQuery, PROPERTIES };
+module.exports = { getArtistRelations, findArtistByMbid, relationsQuery };

@@ -103,12 +103,8 @@ function acquireSlot(source) {
   return sleep(startAt - now);
 }
 
-function currentStats() {
-  return requestContext.getStore();
-}
-
 function count(field) {
-  const stats = currentStats();
+  const stats = requestContext.getStore();
   if (stats) stats[field] += 1;
 }
 
@@ -169,14 +165,11 @@ function configure(overrides) {
 }
 
 module.exports = {
-  SOURCES,
-  TIMEOUT_MS,
   USER_AGENT,
   request,
   cacheKey,
   isOffline,
   withRequestStats,
-  currentStats,
   count,
   configure,
   flushCache,

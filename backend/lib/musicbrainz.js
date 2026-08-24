@@ -84,4 +84,4 @@ async function getArtist(mbid) {
   };
 }
 
-module.exports = { searchRecording, getRecording, getRecordingsByIsrc, getArtist, luceneQuote, wikidataIdFromRelations };
+module.exports = { searchRecording, getRecording, getRecordingsByIsrc, getArtist, luceneQuote };

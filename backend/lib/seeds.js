@@ -94,4 +94,4 @@ async function resolveSeeds(sequence) {
   return { seeds, warnings, getArtist };
 }
 
-module.exports = { resolveSeeds, seedSummary, failureError, label };
+module.exports = { resolveSeeds, seedSummary, failureError };

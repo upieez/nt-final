@@ -88,4 +88,4 @@ async function buildPool({ seeds, poolMode = 'dynamic', poolSize, excludeArtists
   return { mode: 'dynamic', candidates, excluded, fallbackReason: null, failures };
 }
 
-module.exports = { buildPool, clampPoolSize, DEFAULT_POOL_SIZE, MAX_POOL_SIZE, MIN_DYNAMIC_POOL, FIXED_POOL };
+module.exports = { buildPool, clampPoolSize, MAX_POOL_SIZE, FIXED_POOL };
