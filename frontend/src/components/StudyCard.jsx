@@ -6,7 +6,7 @@ function ScaleGroup({ name, label, value, onChange, low, high }) {
   const id = useId();
   return (
     <fieldset className="scale">
-      <legend className="label">{label}</legend>
+      <legend className="label">{label} <span className="visually-hidden">(1 is {low}, 5 is {high})</span></legend>
       <div className="scale-options">
         {SCALE.map((n) => (
           <label key={n} className={`scale-option${value === n ? ' scale-option-on' : ''}`}>

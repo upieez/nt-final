@@ -18,10 +18,10 @@ export default function ScoreBreakdown({ breakdown }) {
           return (
             <li key={p.key} className="bar-row">
               <span className="bar-label">{p.label}</span>
-              <span className="bar-track" aria-hidden="true">
+              <span className="bar-track" role="img" aria-label={`${p.label} ${value.toFixed(2)}`}>
                 <span className={`bar-fill${p.negative ? ' bar-fill-negative' : ''}`} style={{ width }} />
               </span>
-              <span className="bar-value">{p.negative && value > 0 ? '-' : ''}{value.toFixed(2)}</span>
+              <span className="bar-value" aria-hidden="true">{p.negative && value > 0 ? '-' : ''}{value.toFixed(2)}</span>
             </li>
           );
         })}

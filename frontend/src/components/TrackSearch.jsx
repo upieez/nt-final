@@ -49,6 +49,7 @@ export default function TrackSearch({ onAdd, disabled }) {
         {status === 'error' && 'Search failed. You can still add the track by hand below.'}
         {status === 'offline' && 'Could not reach the server. Is the backend running?'}
         {status === 'done' && results.length === 0 && 'No matches. Try the manual form below.'}
+        {status === 'done' && results.length > 0 && `${results.length} matches`}
       </div>
       {results.length > 0 && (
         <ul className="search-results" aria-label="Search results">

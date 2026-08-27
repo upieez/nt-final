@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import ScoreBreakdown from './ScoreBreakdown.jsx';
 import YouTubePlayer from './YouTubePlayer.jsx';
 
@@ -15,9 +16,15 @@ function TagList({ label, items }) {
 
 export default function ResultCard({ result, onUseAsSeed }) {
   const { recommendation, score, breakdown, explanation = {}, alternatives = [], diagnostics = {}, candidatePool = {}, warnings = [] } = result;
+  const headingRef = useRef(null);
+
+  useEffect(() => {
+    if (headingRef.current) headingRef.current.focus();
+  }, [result]);
+
   return (
     <section className="panel result" aria-labelledby="result-heading">
-      <h2 id="result-heading">Play next</h2>
+      <h2 id="result-heading" ref={headingRef} tabIndex={-1}>Play next</h2>
       <div className="result-main">
         <p className="result-title">{recommendation.title}</p>
         <p className="result-artist">by {recommendation.artist}</p>
@@ -76,7 +83,7 @@ export default function ResultCard({ result, onUseAsSeed }) {
         </ul>
       )}
 
-      <footer className="diagnostics">
+      <footer className="diagnostics" aria-label="Diagnostics">
         <span>Latency {diagnostics.latencyMs ?? '?'} ms</span>
         <span>Cache hits {diagnostics.cacheHits ?? 0} / misses {diagnostics.cacheMisses ?? 0}</span>
         <span>Upstream calls {diagnostics.upstreamCalls ?? 0}</span>

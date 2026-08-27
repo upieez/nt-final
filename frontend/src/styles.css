@@ -11,7 +11,7 @@
   --danger: #a8321f;
   --danger-soft: #f8e0db;
   --ok: #1f7a3f;
-  --focus: #e0871a;
+  --focus: #b45f04;
   --radius: 8px;
   --space-1: 0.25rem;
   --space-2: 0.5rem;
@@ -427,7 +427,10 @@ a {
   border: none;
   color: var(--danger);
   cursor: pointer;
+  min-width: 1.75rem;
+  min-height: 1.75rem;
   padding: 0 var(--space-1);
+  border-radius: 999px;
 }
 
 select.input {
@@ -760,4 +763,36 @@ select.input {
 .health-down {
   color: var(--danger);
   border-color: var(--danger);
+}
+
+[tabindex="-1"]:focus {
+  outline: none;
+}
+
+[tabindex="-1"]:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 4px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }

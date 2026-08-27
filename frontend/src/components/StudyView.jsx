@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import StudyCard from './StudyCard.jsx';
 import ErrorMessage from './ErrorMessage.jsx';
 import { postJson } from '../lib/api.js';
@@ -31,14 +31,14 @@ function Consent({ onAgree }) {
   );
 }
 
-function SequencePicker({ ownSequence, onStart, loading, error }) {
+function SequencePicker({ ownSequence, onStart, loading, error, headingRef }) {
   const [choice, setChoice] = useState(PRESET_SEQUENCES[0].id);
   const ownAvailable = ownSequence.length > 0;
   const chosen = choice === OWN ? ownSequence : PRESET_SEQUENCES.find((p) => p.id === choice).tracks;
 
   return (
     <section className="panel" aria-labelledby="pick-h">
-      <h2 id="pick-h">Pick a listening sequence</h2>
+      <h2 id="pick-h" ref={headingRef} tabIndex={-1}>Pick a listening sequence</h2>
       <fieldset className="scale">
         <legend className="label">Sequences</legend>
         <ul className="preset-list">
@@ -78,6 +78,11 @@ export default function StudyView({ sequence, preferences }) {
   const [ratings, setRatings] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const stageRef = useRef(null);
+
+  useEffect(() => {
+    if (stageRef.current) stageRef.current.focus();
+  }, [stage]);
 
   async function startTrial(seq) {
     setLoading(true);
@@ -120,12 +125,12 @@ export default function StudyView({ sequence, preferences }) {
 
   if (stage === 'consent') return <Consent onAgree={() => setStage('pick')} />;
   if (stage === 'pick') {
-    return <SequencePicker ownSequence={sequence} onStart={startTrial} loading={loading} error={error} />;
+    return <SequencePicker ownSequence={sequence} onStart={startTrial} loading={loading} error={error} headingRef={stageRef} />;
   }
   if (stage === 'thanks') {
     return (
       <section className="panel" aria-labelledby="thanks-h">
-        <h2 id="thanks-h">Thank you</h2>
+        <h2 id="thanks-h" ref={stageRef} tabIndex={-1}>Thank you</h2>
         <p>Your ratings were recorded anonymously.</p>
         <button type="button" className="btn btn-primary" onClick={nextSequence}>Rate another sequence</button>
       </section>
@@ -135,7 +140,7 @@ export default function StudyView({ sequence, preferences }) {
   return (
     <>
       <section className="panel" aria-labelledby="seq-h">
-        <h2 id="seq-h">The sequence you just heard</h2>
+        <h2 id="seq-h" ref={stageRef} tabIndex={-1}>The sequence you just heard</h2>
         <ol className="study-seq">
           {trialSequence.map((t) => <li key={trackLabel(t)}>{trackLabel(t)}</li>)}
         </ol>
@@ -152,7 +157,9 @@ export default function StudyView({ sequence, preferences }) {
           <button type="button" className="btn btn-primary" disabled={!allRatingsComplete(ratings) || loading} onClick={submit}>
             {loading ? 'Submitting...' : 'Submit ratings'}
           </button>
-          {!allRatingsComplete(ratings) && <span className="muted small">Rate every option to enable submit.</span>}
+          <span role="status" className="muted small">
+            {!allRatingsComplete(ratings) && 'Rate every option to enable submit.'}
+          </span>
           <button type="button" className="btn btn-link" onClick={nextSequence}>Skip this sequence</button>
         </div>
         <ErrorMessage error={error} />
