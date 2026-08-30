@@ -131,3 +131,16 @@ backend/
   test/                  jest suites and hand-written fixtures
 docs/scoring.md          scoring formula and weights
 ```
+
+## Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev            # http://localhost:5173, proxies /api to the backend on port 3000
+```
+
+A React client with a seed builder, preference sliders, an explanation view for each
+recommendation, a YouTube embed of the chosen track, and a blind rating study that compares
+NextTrack against random and most-popular baselines. All client state is in memory only, so there
+is nothing to clear and nothing that follows you between visits. See `frontend/README.md`.
