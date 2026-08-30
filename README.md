@@ -22,3 +22,16 @@ curl -X POST http://localhost:3000/api/v1/recommendations/next-track \
   -d '{"sequence":[{"artist":"Joy Division","title":"Disorder"},{"artist":"The Cure","title":"A Forest"}],
        "preferences":{"genreStrictness":0.5,"discoveryFactor":0.5}}'
 ```
+
+## Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev            # http://localhost:5173, proxies /api to the backend on port 3000
+```
+
+A React client with a seed builder, preference sliders, an explanation view for each
+recommendation, a YouTube embed of the chosen track, and a blind rating study that compares
+NextTrack against random and most-popular baselines. All client state is in memory only, so there
+is nothing to clear and nothing that follows you between visits. See `frontend/README.md`.
