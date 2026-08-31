@@ -20,7 +20,7 @@ describe('POST /api/v1/recommendations/next-track', () => {
     const body = res.body;
     expect(body.recommendation).toEqual({ artist: 'Siouxsie and the Banshees', title: 'Spellbound', mbid: 'rec-spellbound', wikidataId: 'Q5', listeners: 650000, tags: ['post-punk', 'gothic rock', 'new wave', '80s'] });
     expect(typeof body.score).toBe('number');
-    expect(body.breakdown).toEqual({ tagOverlap: expect.any(Number), genreOverlap: expect.any(Number), graphSignal: expect.any(Number), popularityPenalty: expect.any(Number), recencyWeightApplied: true });
+    expect(body.breakdown).toEqual({ tagOverlap: expect.any(Number), genreOverlap: expect.any(Number), graphSignal: expect.any(Number), popularityPenalty: expect.any(Number), recencyWeightApplied: true, divergence: 0, divergenceApplied: false });
     expect(body.explanation.matchedTags).toContain('post-punk');
     expect(body.explanation.matchedGenres).toEqual(['post-punk', 'gothic rock']);
     expect(body.explanation.sharedRelations).toContainEqual({ type: 'country', value: 'GB', with: 'The Cure' });
@@ -160,6 +160,20 @@ describe('POST /api/v1/recommendations/next-track', () => {
     expect(obscure.body.recommendation.listeners).toBeLessThan(mainstream.body.recommendation.listeners);
     expect(obscure.body.breakdown.popularityPenalty).toBeGreaterThan(0);
     expect(mainstream.body.breakdown.popularityPenalty).toBe(0);
+  });
+
+  test('divergence 0 leaves the ranking unchanged and divergence 1 flips the winner to the least similar track', async () => {
+    world.install();
+    const base = await post({ sequence: SEQUENCE, preferences: { discoveryFactor: 0 } });
+    const same = await post({ sequence: SEQUENCE, preferences: { discoveryFactor: 0, divergence: 0 } });
+    const far = await post({ sequence: SEQUENCE, preferences: { discoveryFactor: 0, divergence: 1 } });
+    expect(same.body.recommendation).toEqual(base.body.recommendation);
+    expect(same.body.score).toBe(base.body.score);
+    expect(far.body.recommendation.title).not.toBe(base.body.recommendation.title);
+    expect(far.body.breakdown).toMatchObject({ divergence: 1, divergenceApplied: true });
+    expect(far.body.score).toBeCloseTo(1 - (far.body.breakdown.tagOverlap * 0.5 + far.body.breakdown.genreOverlap * 0.3 + far.body.breakdown.graphSignal * 0.2), 3);
+    const clamped = await post({ sequence: SEQUENCE, preferences: { discoveryFactor: 0, divergence: 4 } });
+    expect(clamped.body.recommendation).toEqual(far.body.recommendation);
   });
 
   test('high genreStrictness excludes candidates that share nothing with the most recent seed', async () => {

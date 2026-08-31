@@ -54,8 +54,12 @@ artist-level and describe a whole catalogue.
 
 ## Preferences
 
+- `divergence` (v, default 0): applied first, `raw' = (1 - v) * raw + v * (1 - raw)`. At v = 0 the
+  score is untouched; at v = 1 the least similar candidate ranks first; at v = 0.5 every candidate
+  scores 0.5 before the popularity penalty, so popularity alone decides. `breakdown.divergence` echoes
+  the value and `breakdown.divergenceApplied` is true when v > 0.
 - `discoveryFactor` (d): `popularity = log(listeners + 1) / log(maxListeners + 1)` over the eligible
-  pool, `popularityPenalty = raw * d * popularity`, `score = raw - popularityPenalty`.
+  pool, `popularityPenalty = raw' * d * popularity`, `score = raw' - popularityPenalty`.
   At d = 1 the most popular candidate scores 0; at d = 0 popularity is ignored.
 - `genreStrictness` (g): a candidate "overlaps the most recent seed" when it shares at least one tag
   or genre with `s_n`. At `g >= STRICTNESS_THRESHOLD (0.7)` candidates without that overlap are

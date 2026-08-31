@@ -8,6 +8,7 @@ const GRAPH_WEIGHTS = { member: 0.5, label: 0.4, artist: 0.3, country: 0.1 };
 const RECENCY_BASE = 0.6;
 const STRICTNESS_THRESHOLD = 0.7;
 const SOFT_STRICTNESS = 0.5;
+const DIVERGENCE_THRESHOLD = 0.5;
 // Artist tags describe a whole catalogue, so they count as weaker evidence than track tags
 const ARTIST_TAG_CONFIDENCE = 0.6;
 
@@ -159,6 +160,15 @@ function combineSignals({ tagOverlap, genreOverlap, graphSignal }) {
   return W_TAG * tagOverlap + W_GENRE * genreOverlap + W_GRAPH * graphSignal;
 }
 
+// Blends similarity toward its complement so at divergence 1 the least similar candidate ranks first
+function applyDivergence(rawScore, divergence) {
+  return (1 - divergence) * rawScore + divergence * (1 - rawScore);
+}
+
+function highDivergence(divergence) {
+  return divergence >= DIVERGENCE_THRESHOLD;
+}
+
 function normalisePopularity(listeners, maxListeners) {
   if (!maxListeners || maxListeners <= 0) return 0;
   return Math.log((listeners || 0) + 1) / Math.log(maxListeners + 1);
@@ -199,6 +209,7 @@ module.exports = {
   GRAPH_WEIGHTS,
   RECENCY_BASE,
   STRICTNESS_THRESHOLD,
+  DIVERGENCE_THRESHOLD,
   ARTIST_TAG_CONFIDENCE,
   normaliseTags,
   buildSequenceTagSet,
@@ -209,6 +220,8 @@ module.exports = {
   relationsBetween,
   combineSignals,
   applyDiscoveryPenalty,
+  applyDivergence,
+  highDivergence,
   applyStrictness,
   matchesTargetGenre,
   rankCandidates

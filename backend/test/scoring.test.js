@@ -95,6 +95,14 @@ describe('combination, penalties and filters', () => {
     expect(scoring.applyDiscoveryPenalty(0.5, 1000, 1000, 0).adjustedScore).toBe(0.5);
   });
 
+  test('divergence blends the score toward its complement', () => {
+    expect(scoring.applyDivergence(0.8, 0)).toBe(0.8);
+    expect(scoring.applyDivergence(0.8, 1)).toBeCloseTo(0.2, 9);
+    expect(scoring.applyDivergence(0.8, 0.5)).toBeCloseTo(0.5, 9);
+    expect(scoring.highDivergence(0.49)).toBe(false);
+    expect(scoring.highDivergence(0.5)).toBe(true);
+  });
+
   test('soft strictness damps candidates that miss the most recent seed below the hard threshold', () => {
     expect(scoring.applyStrictness(0.4, false, 0.5)).toBeCloseTo(0.3, 9);
     expect(scoring.applyStrictness(0.4, true, 0.5)).toBe(0.4);

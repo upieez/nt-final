@@ -41,6 +41,7 @@ function validatePreferences(preferences, details) {
   return {
     genreStrictness: clamp01(prefs.genreStrictness, 0.5),
     discoveryFactor: clamp01(prefs.discoveryFactor, 0.5),
+    divergence: clamp01(prefs.divergence, 0),
     targetGenre: typeof prefs.targetGenre === 'string' && prefs.targetGenre.trim() ? prefs.targetGenre.trim() : null,
     excludeArtists: Array.isArray(exclude) ? exclude.filter((a) => typeof a === 'string') : []
   };

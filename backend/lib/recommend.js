@@ -85,7 +85,8 @@ function noEligibleMessage(preferences) {
 function applyPenalties(eligible, preferences) {
   const maxListeners = Math.max(0, ...eligible.map((s) => s.listeners || 0));
   for (const s of eligible) {
-    const penalised = scoring.applyDiscoveryPenalty(s.rawScore, s.listeners, maxListeners, preferences.discoveryFactor);
+    const diverged = scoring.applyDivergence(s.rawScore, preferences.divergence);
+    const penalised = scoring.applyDiscoveryPenalty(diverged, s.listeners, maxListeners, preferences.discoveryFactor);
     s.popularityPenalty = penalised.popularityPenalty;
     s.adjustedScore = scoring.applyStrictness(penalised.adjustedScore, s.overlapsMostRecent, preferences.genreStrictness);
   }
@@ -172,7 +173,9 @@ async function runPipeline({ sequence, preferences, options }, startedAt) {
       genreOverlap: round(winner.genreOverlap),
       graphSignal: round(winner.graphSignal),
       popularityPenalty: round(winner.popularityPenalty),
-      recencyWeightApplied: seeds.filter((s) => s.usable).length > 1
+      recencyWeightApplied: seeds.filter((s) => s.usable).length > 1,
+      divergence: preferences.divergence,
+      divergenceApplied: preferences.divergence > 0
     },
     explanation: {
       matchedTags: winner.matchedTags,
