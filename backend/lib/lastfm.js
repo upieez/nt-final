@@ -98,6 +98,13 @@ async function getArtistTopTracks(artist, limit = 5) {
   return { tracks: asArray(body.toptracks?.track).map(mapTopTrack).filter((t) => t.artist && t.title), status: 'ok' };
 }
 
+// Tag charts carry no listener counts, so contrast candidates get their popularity from track.getInfo later
+async function getTagTopTracks(tag, limit = 10) {
+  const { status, message, body } = await callLastfm({ method: 'tag.gettoptracks', tag, limit });
+  if (status !== 'ok') return { tracks: null, status, message };
+  return { tracks: asArray(body.tracks?.track).map((t) => ({ artist: t.artist?.name || '', title: t.name || '' })).filter((t) => t.artist && t.title), status: 'ok' };
+}
+
 async function searchTracks(query, limit = 8) {
   const { status, message, body } = await callLastfm({ method: 'track.search', track: query, limit });
   if (status !== 'ok') return { results: null, status, message };
@@ -113,5 +120,6 @@ module.exports = {
   getSimilarTracks,
   getSimilarArtists,
   getArtistTopTracks,
+  getTagTopTracks,
   searchTracks
 };

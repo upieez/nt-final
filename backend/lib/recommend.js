@@ -70,8 +70,10 @@ function scoreOne(candidate, tagResult, entity, context) {
   };
 }
 
+// At high divergence strictness is ignored entirely; targetGenre still applies
 function passesFilters(scored, preferences) {
   if (!scoring.matchesTargetGenre(preferences.targetGenre, scored.tags, scored.genres)) return false;
+  if (scoring.highDivergence(preferences.divergence)) return true;
   if (preferences.genreStrictness >= scoring.STRICTNESS_THRESHOLD && !scored.overlapsMostRecent) return false;
   return true;
 }
@@ -88,9 +90,14 @@ function applyPenalties(eligible, preferences) {
     const diverged = scoring.applyDivergence(s.rawScore, preferences.divergence);
     const penalised = scoring.applyDiscoveryPenalty(diverged, s.listeners, maxListeners, preferences.discoveryFactor);
     s.popularityPenalty = penalised.popularityPenalty;
-    s.adjustedScore = scoring.applyStrictness(penalised.adjustedScore, s.overlapsMostRecent, preferences.genreStrictness);
+    const strictness = scoring.highDivergence(preferences.divergence) ? 0 : preferences.genreStrictness;
+    s.adjustedScore = scoring.applyStrictness(penalised.adjustedScore, s.overlapsMostRecent, strictness);
   }
   return scoring.rankCandidates(eligible);
+}
+
+function sequenceTagNames(seeds) {
+  return seeds.flatMap((s) => s.tags.map((t) => t.name));
 }
 
 function buildContext(seeds) {
@@ -155,8 +162,11 @@ async function scorePool({ seeds, getArtist, preferences, pool, startedAt, warni
 
 async function runPipeline({ sequence, preferences, options }, startedAt) {
   const { seeds, warnings, getArtist } = await resolveSeeds(sequence);
-  const pool = await buildPool({ seeds: sequence, poolMode: options.poolMode, poolSize: options.poolSize, excludeArtists: preferences.excludeArtists });
+  const pool = await buildPool({ seeds: sequence, poolMode: options.poolMode, poolSize: options.poolSize, excludeArtists: preferences.excludeArtists, divergence: preferences.divergence, sequenceTags: sequenceTagNames(seeds) });
   if (pool.fallbackReason) warnings.push({ track: '(pool)', issue: `fell back to the fixed candidate pool: ${pool.fallbackReason}` });
+  if (scoring.highDivergence(preferences.divergence) && preferences.genreStrictness > 0) {
+    warnings.push({ track: '(preferences)', issue: `genreStrictness ${preferences.genreStrictness} ignored because divergence ${preferences.divergence} asks for something different` });
+  }
   const { ranked, counts, skipped } = await scorePool({ seeds, getArtist, preferences, pool, startedAt, warnings });
   if (ranked.length === 0) {
     const upstream = failureError(pool.failures);
@@ -184,7 +194,7 @@ async function runPipeline({ sequence, preferences, options }, startedAt) {
       summary: buildSummary({ ...winner, mostRecentArtist: mostRecent.track.artist })
     },
     alternatives: alternativesFrom(ranked, options.alternatives),
-    candidatePool: { mode: pool.mode, size: pool.candidates.length, ...counts },
+    candidatePool: { mode: pool.mode, size: pool.candidates.length, ...counts, contrast: pool.contrast },
     seeds: seeds.map(seedSummary),
     warnings,
     skipped

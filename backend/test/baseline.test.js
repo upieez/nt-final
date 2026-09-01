@@ -22,7 +22,7 @@ describe('POST /api/v1/recommendations/baseline', () => {
     expect(res.body.breakdown).toBeUndefined();
     expect(res.body.score).toBeNull();
     expect(res.body.alternatives[0].title).toBe('Blue Monday');
-    expect(res.body.candidatePool).toEqual({ mode: 'dynamic', size: 10, scored: 10, scoreless: 0, excluded: 0 });
+    expect(res.body.candidatePool).toEqual({ mode: 'dynamic', size: 10, scored: 10, scoreless: 0, excluded: 0, contrast: 0 });
     expect(res.body.seeds).toHaveLength(2);
     expect(res.body.diagnostics.latencyMs).toEqual(expect.any(Number));
   });

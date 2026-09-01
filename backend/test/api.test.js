@@ -27,7 +27,7 @@ describe('POST /api/v1/recommendations/next-track', () => {
     expect(body.explanation.summary).toBe('Shares post-punk, gothic rock and new wave with your most recent tracks, and has the same country as Joy Division and The Cure.');
     expect(body.alternatives).toHaveLength(3);
     expect(body.alternatives[0]).toEqual({ artist: expect.any(String), title: expect.any(String), score: expect.any(Number), matchedTags: expect.any(Array) });
-    expect(body.candidatePool).toEqual({ mode: 'dynamic', size: 10, scored: 10, scoreless: 0, excluded: 0 });
+    expect(body.candidatePool).toEqual({ mode: 'dynamic', size: 10, scored: 10, scoreless: 0, excluded: 0, contrast: 0 });
     expect(body.seeds).toEqual([
       { artist: 'Joy Division', title: 'Disorder', resolved: true, mbid: 'rec-disorder', tagSource: 'artist' },
       { artist: 'The Cure', title: 'A Forest', resolved: true, mbid: 'rec-forest', tagSource: 'track' }
@@ -171,9 +171,22 @@ describe('POST /api/v1/recommendations/next-track', () => {
     expect(same.body.score).toBe(base.body.score);
     expect(far.body.recommendation.title).not.toBe(base.body.recommendation.title);
     expect(far.body.breakdown).toMatchObject({ divergence: 1, divergenceApplied: true });
+    expect(far.body.candidatePool.contrast).toBe(2);
+    expect(far.body.explanation.matchedTags).toEqual([]);
     expect(far.body.score).toBeCloseTo(1 - (far.body.breakdown.tagOverlap * 0.5 + far.body.breakdown.genreOverlap * 0.3 + far.body.breakdown.graphSignal * 0.2), 3);
     const clamped = await post({ sequence: SEQUENCE, preferences: { discoveryFactor: 0, divergence: 4 } });
     expect(clamped.body.recommendation).toEqual(far.body.recommendation);
+  });
+
+  test('high divergence ignores genreStrictness with a warning while targetGenre still applies', async () => {
+    world.install();
+    const res = await post({ sequence: SEQUENCE, preferences: { divergence: 0.8, genreStrictness: 0.9 }, options: { alternatives: 10 } });
+    expect(res.status).toBe(200);
+    expect(res.body.candidatePool.excluded).toBe(0);
+    expect(res.body.warnings).toContainEqual({ track: '(preferences)', issue: 'genreStrictness 0.9 ignored because divergence 0.8 asks for something different' });
+    const targeted = await post({ sequence: SEQUENCE, preferences: { divergence: 0.8, genreStrictness: 0.9, targetGenre: 'jazz' } });
+    expect(targeted.body.recommendation.title).toBe('So What');
+    expect(targeted.body.candidatePool.scored).toBe(1);
   });
 
   test('high genreStrictness excludes candidates that share nothing with the most recent seed', async () => {

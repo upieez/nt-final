@@ -60,7 +60,7 @@ async function runBaseline({ sequence, strategy, options, preferences }, started
     score: null,
     explanation: { matchedTags: [], matchedGenres: [], sharedRelations: [], summary: SUMMARIES[strategy] },
     alternatives: ordered.slice(1, 1 + options.alternatives).map((c) => ({ artist: c.artist, title: c.title, score: null, matchedTags: [] })),
-    candidatePool: { mode: pool.mode, size: pool.candidates.length, scored: pool.candidates.length, scoreless: 0, excluded: pool.excluded },
+    candidatePool: { mode: pool.mode, size: pool.candidates.length, scored: pool.candidates.length, scoreless: 0, excluded: pool.excluded, contrast: 0 },
     seeds: seeds.map(seedSummary),
     warnings
   };

@@ -58,6 +58,12 @@ describe('lastfm client', () => {
     expect(result.results[0]).toEqual({ artist: 'The Cure', title: 'A Forest', listeners: 812345 });
   });
 
+  test('tag top tracks carry artist and title only', async () => {
+    mock('tag.gettoptracks', { tag: 'jazz', limit: 10 }, 'lastfm/tag.gettoptracks.jazz.json');
+    const result = await lastfm.getTagTopTracks('jazz');
+    expect(result.tracks).toEqual([{ artist: 'The Dave Brubeck Quartet', title: 'Take Five' }, { artist: 'Miles Davis', title: 'So What' }]);
+  });
+
   test('offline mode surfaces offline-miss', async () => {
     process.env.NEXTTRACK_OFFLINE = '1';
     const result = await lastfm.getTopTags('The Cure', 'A Forest');

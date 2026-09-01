@@ -1,0 +1,27 @@
+{
+  "tracks": {
+    "track": [
+      {
+        "name": "Take Five",
+        "duration": "324",
+        "mbid": "",
+        "url": "https://www.last.fm/music/The+Dave+Brubeck+Quartet/_/Take+Five",
+        "streamable": { "#text": "0", "fulltrack": "0" },
+        "artist": { "name": "The Dave Brubeck Quartet", "mbid": "", "url": "https://www.last.fm/music/The+Dave+Brubeck+Quartet" },
+        "image": [],
+        "@attr": { "rank": "1" }
+      },
+      {
+        "name": "So What",
+        "duration": "562",
+        "mbid": "",
+        "url": "https://www.last.fm/music/Miles+Davis/_/So+What",
+        "streamable": { "#text": "0", "fulltrack": "0" },
+        "artist": { "name": "Miles Davis", "mbid": "561d854a-6a28-4aa7-8c99-323e6ce46c2a", "url": "https://www.last.fm/music/Miles+Davis" },
+        "image": [],
+        "@attr": { "rank": "2" }
+      }
+    ],
+    "@attr": { "tag": "jazz", "page": "1", "perPage": "10", "totalPages": "1234", "total": "12340" }
+  }
+}

@@ -1,5 +1,5 @@
 const http = require('../lib/http');
-const { buildPool, clampPoolSize, FIXED_POOL, MAX_POOL_SIZE } = require('../lib/candidates');
+const { buildPool, clampPoolSize, pickContrastTags, CONTRAST_TAGS, FIXED_POOL, MAX_POOL_SIZE } = require('../lib/candidates');
 const world = require('./helpers/world');
 const { nock, lastfm } = require('./helpers/upstream');
 
@@ -39,6 +39,21 @@ describe('candidate pool', () => {
     expect(clampPoolSize(500)).toBe(MAX_POOL_SIZE);
     expect(clampPoolSize('abc')).toBe(40);
     expect(clampPoolSize(0)).toBe(1);
+  });
+
+  test('contrast tags are the first vocabulary entries absent from the sequence', () => {
+    expect(pickContrastTags(['Hip Hop', 'jazz', 'post-punk'])).toEqual(['electronic', 'classical', 'metal']);
+    expect(pickContrastTags([])).toEqual(CONTRAST_TAGS.slice(0, 3));
+  });
+
+  test('high divergence merges contrast candidates from tag charts and counts them', async () => {
+    world.install();
+    const low = await buildPool({ seeds: SEEDS, poolMode: 'dynamic', poolSize: 40, divergence: 0.49, sequenceTags: ['post-punk'] });
+    const high = await buildPool({ seeds: SEEDS, poolMode: 'dynamic', poolSize: 40, divergence: 0.5, sequenceTags: ['post-punk'] });
+    expect(low.contrast).toBe(0);
+    expect(high.contrast).toBe(2);
+    expect(high.candidates.filter((c) => c.origin === 'contrast').map((c) => c.tag)).toEqual(['hip-hop', 'jazz']);
+    expect(high.candidates.map((c) => c.title)).toContain('So What');
   });
 
   test('fixed mode uses the bundled file without any network call', async () => {

@@ -1,7 +1,8 @@
 const path = require('path');
 const fs = require('fs');
 const lastfm = require('./lastfm');
-const { trackKey, sameName } = require('./reconcile');
+const { trackKey, sameName, normaliseName } = require('./reconcile');
+const { highDivergence } = require('./scoring');
 
 const DEFAULT_POOL_SIZE = 40;
 const MAX_POOL_SIZE = 80;
@@ -9,6 +10,14 @@ const MIN_DYNAMIC_POOL = 5;
 const SIMILAR_TRACKS_PER_SEED = 20;
 const SIMILAR_ARTISTS_PER_SEED = 5;
 const TOP_TRACKS_PER_ARTIST = 5;
+const CONTRAST_TAG_COUNT = 3;
+const CONTRAST_TRACKS_PER_TAG = 10;
+// Broad Last.fm genre tags used to pull in deliberately unrelated candidates at high divergence
+const CONTRAST_TAGS = [
+  'hip-hop', 'electronic', 'jazz', 'classical', 'metal', 'folk', 'country', 'blues', 'reggae', 'punk',
+  'soul', 'funk', 'ambient', 'techno', 'house', 'pop', 'rock', 'indie', 'rnb', 'latin', 'world music',
+  'experimental', 'gospel', 'disco', 'dance'
+];
 const FIXED_POOL = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'candidates.json'), 'utf8'));
 
 function clampPoolSize(value) {
@@ -33,6 +42,22 @@ async function gatherForSeed(seed, failures) {
     const top = await lastfm.getArtistTopTracks(a.name, TOP_TRACKS_PER_ARTIST);
     noteFailure(failures, 'lastfm', top.status);
     for (const t of top.tracks || []) list.push({ artist: t.artist, title: t.title, origin: 'similar-artist' });
+  }
+  return list;
+}
+
+// The first vocabulary tags absent from the sequence, in a fixed order so results are reproducible
+function pickContrastTags(sequenceTags) {
+  const present = new Set([...(sequenceTags || [])].map(normaliseName));
+  return CONTRAST_TAGS.filter((tag) => !present.has(normaliseName(tag))).slice(0, CONTRAST_TAG_COUNT);
+}
+
+async function gatherContrast(sequenceTags, failures) {
+  const list = [];
+  for (const tag of pickContrastTags(sequenceTags)) {
+    const top = await lastfm.getTagTopTracks(tag, CONTRAST_TRACKS_PER_TAG);
+    noteFailure(failures, 'lastfm', top.status);
+    for (const t of top.tracks || []) list.push({ artist: t.artist, title: t.title, origin: 'contrast', tag });
   }
   return list;
 }
@@ -68,24 +93,29 @@ function dedupe(items, seeds, excludeArtists, cap) {
   return { candidates, excluded };
 }
 
-function fixedPool(seeds, excludeArtists, cap, fallbackReason) {
-  const items = FIXED_POOL.map((c) => ({ ...c, origin: 'fixed' }));
-  return { mode: 'fixed', ...dedupe(items, seeds, excludeArtists, cap), fallbackReason, failures: [] };
+function contrastCount(candidates) {
+  return candidates.filter((c) => c.origin === 'contrast').length;
 }
 
-// Returns { mode, candidates[], excluded, fallbackReason, failures[] }
-async function buildPool({ seeds, poolMode = 'dynamic', poolSize, excludeArtists = [] }) {
+function fixedPool(seeds, excludeArtists, cap, fallbackReason) {
+  const items = FIXED_POOL.map((c) => ({ ...c, origin: 'fixed' }));
+  return { mode: 'fixed', ...dedupe(items, seeds, excludeArtists, cap), contrast: 0, fallbackReason, failures: [] };
+}
+
+// Returns { mode, candidates[], excluded, contrast, fallbackReason, failures[] }
+async function buildPool({ seeds, poolMode = 'dynamic', poolSize, excludeArtists = [], divergence = 0, sequenceTags = [] }) {
   const cap = clampPoolSize(poolSize);
   if (poolMode === 'fixed') return fixedPool(seeds, excludeArtists, cap, null);
   const failures = [];
   const lists = [];
   for (const seed of [...seeds].reverse()) lists.push(await gatherForSeed(seed, failures));
+  if (highDivergence(divergence)) lists.push(await gatherContrast(sequenceTags, failures));
   const { candidates, excluded } = dedupe(interleave(lists), seeds, excludeArtists, cap);
   if (candidates.length < MIN_DYNAMIC_POOL) {
     const reason = failures.length ? `dynamic pool unavailable (${failures[0].source} ${failures[0].status})` : `dynamic pool too small (${candidates.length})`;
     return { ...fixedPool(seeds, excludeArtists, cap, reason), failures };
   }
-  return { mode: 'dynamic', candidates, excluded, fallbackReason: null, failures };
+  return { mode: 'dynamic', candidates, excluded, contrast: contrastCount(candidates), fallbackReason: null, failures };
 }
 
-module.exports = { buildPool, clampPoolSize, MAX_POOL_SIZE, FIXED_POOL };
+module.exports = { buildPool, clampPoolSize, pickContrastTags, CONTRAST_TAGS, MAX_POOL_SIZE, FIXED_POOL };

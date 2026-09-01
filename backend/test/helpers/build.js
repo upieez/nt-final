@@ -26,6 +26,10 @@ function lastfmTopTracks(artist, tracks) {
   return { toptracks: { track: tracks.map(([title, listeners], i) => ({ name: title, playcount: String(listeners * 4), listeners: String(listeners), mbid: '', url: '', streamable: '0', artist: { name: artist, mbid: '', url: '' }, image: [], '@attr': { rank: String(i + 1) } })), '@attr': { artist } } };
 }
 
+function lastfmTagTopTracks(tag, tracks) {
+  return { tracks: { track: tracks.map(([artist, title], i) => ({ name: title, duration: '200', mbid: '', url: '', streamable: { '#text': '0', fulltrack: '0' }, artist: { name: artist, mbid: '', url: '' }, image: [], '@attr': { rank: String(i + 1) } })), '@attr': { tag, page: '1', perPage: String(tracks.length), totalPages: '1', total: String(tracks.length) } } };
+}
+
 function lastfmSearch(tracks) {
   return { results: { 'opensearch:totalResults': String(tracks.length), trackmatches: { track: tracks.map(([artist, title, listeners]) => ({ name: title, artist, url: '', streamable: 'FIXME', listeners: String(listeners), image: [], mbid: '' })) }, '@attr': {} } };
 }
@@ -80,4 +84,4 @@ function wdMbidResult(qid) {
   return { head: { vars: ['item'] }, results: { bindings: qid ? [{ item: { type: 'uri', value: `http://www.wikidata.org/entity/${qid}` } }] : [] } };
 }
 
-module.exports = { lastfmTags, lastfmTrackInfo, lastfmSimilarTracks, lastfmSimilarArtists, lastfmTopTracks, lastfmSearch, mbRecording, mbSearch, mbArtist, wdRelations, wdMbidResult };
+module.exports = { lastfmTags, lastfmTrackInfo, lastfmSimilarTracks, lastfmSimilarArtists, lastfmTopTracks, lastfmTagTopTracks, lastfmSearch, mbRecording, mbSearch, mbArtist, wdRelations, wdMbidResult };
