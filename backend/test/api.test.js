@@ -173,6 +173,9 @@ describe('POST /api/v1/recommendations/next-track', () => {
     expect(far.body.breakdown).toMatchObject({ divergence: 1, divergenceApplied: true });
     expect(far.body.candidatePool.contrast).toBe(2);
     expect(far.body.explanation.matchedTags).toEqual([]);
+    expect(far.body.explanation.summary).toBe('Chosen to be far from your recent tracks: jazz, cool jazz and instrumental rather than the post-punk, gothic rock and new wave of The Cure, sharing no tags, genres or relations with them.');
+    const partial = await post({ sequence: SEQUENCE, preferences: { divergence: 0.6 } });
+    expect(partial.body.explanation.summary).toBe('Chosen to be far from your recent tracks: darkwave and gothic rock rather than the post-punk, gothic rock and new wave of The Cure, still sharing only gothic rock.');
     expect(far.body.score).toBeCloseTo(1 - (far.body.breakdown.tagOverlap * 0.5 + far.body.breakdown.genreOverlap * 0.3 + far.body.breakdown.graphSignal * 0.2), 3);
     const clamped = await post({ sequence: SEQUENCE, preferences: { discoveryFactor: 0, divergence: 4 } });
     expect(clamped.body.recommendation).toEqual(far.body.recommendation);

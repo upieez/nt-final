@@ -191,7 +191,7 @@ async function runPipeline({ sequence, preferences, options }, startedAt) {
       matchedTags: winner.matchedTags,
       matchedGenres: winner.matchedGenres,
       sharedRelations: winner.sharedRelations,
-      summary: buildSummary({ ...winner, mostRecentArtist: mostRecent.track.artist })
+      summary: buildSummary({ ...winner, mostRecentArtist: mostRecent.track.artist, divergence: preferences.divergence, candidateTags: winner.tags, recentTags: mostRecent.tags })
     },
     alternatives: alternativesFrom(ranked, options.alternatives),
     candidatePool: { mode: pool.mode, size: pool.candidates.length, ...counts, contrast: pool.contrast },

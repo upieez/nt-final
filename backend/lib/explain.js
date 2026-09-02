@@ -1,4 +1,5 @@
 const { normaliseName } = require('./reconcile');
+const { highDivergence } = require('./scoring');
 
 const MAX_TAGS_SHOWN = 10;
 
@@ -33,8 +34,21 @@ function relationPhrases(sharedRelations) {
     .filter(Boolean);
 }
 
+// At high divergence the sentence says what the pick is instead of, or the one thing it still shares
+function buildDivergentSummary({ matchedTags, matchedGenres, candidateTags, recentTags, mostRecentArtist }) {
+  const own = topTagNames(candidateTags).slice(0, 3);
+  const recent = topTagNames(recentTags).slice(0, 3);
+  const shared = [...new Set([...matchedTags, ...matchedGenres])];
+  const lead = `Chosen to be far from your recent tracks${own.length ? `: ${joinNames(own)}` : ''}`;
+  const contrast = recent.length ? ` rather than the ${joinNames(recent)} of ${mostRecentArtist}` : '';
+  if (shared.length === 0) return `${lead}${contrast}, sharing no tags, genres or relations with them.`;
+  if (shared.length === 1) return `${lead}${contrast}, still sharing only ${shared[0]}.`;
+  return `${lead}${contrast}, still sharing ${joinNames(shared.slice(0, 3))}.`;
+}
+
 // One human sentence built from the strongest evidence, tags first, then genres, then graph relations
-function buildSummary({ matchedTags, matchedGenres, sharedRelations, mostRecentArtist }) {
+function buildSummary({ matchedTags, matchedGenres, sharedRelations, mostRecentArtist, divergence = 0, candidateTags = [], recentTags = [] }) {
+  if (highDivergence(divergence)) return buildDivergentSummary({ matchedTags, matchedGenres, candidateTags, recentTags, mostRecentArtist });
   const parts = [];
   if (matchedTags.length) parts.push(`Shares ${joinNames(matchedTags.slice(0, 3))} with your most recent tracks`);
   const tagKeys = matchedTags.map(normaliseName);
