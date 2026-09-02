@@ -796,3 +796,29 @@ select.input {
     scroll-behavior: smooth;
   }
 }
+
+.prefs-lead {
+  margin-bottom: var(--space-4);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px dashed var(--border);
+}
+
+.slider-track {
+  position: relative;
+}
+
+.slider-track-midpoint::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0.15rem;
+  bottom: 0.15rem;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--text-muted);
+  pointer-events: none;
+}
+
+.slider-midpoint-label {
+  color: var(--text-muted);
+}

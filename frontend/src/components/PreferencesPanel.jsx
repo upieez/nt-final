@@ -1,5 +1,6 @@
 import { useId, useState } from 'react';
 import Slider from './Slider.jsx';
+import DivergenceSlider from './DivergenceSlider.jsx';
 import { addExcludedArtist } from '../lib/preferences.js';
 
 export default function PreferencesPanel({ preferences, options, onChange, onOptionsChange }) {
@@ -25,6 +26,9 @@ export default function PreferencesPanel({ preferences, options, onChange, onOpt
   return (
     <section className="panel" aria-labelledby="prefs-heading">
       <h2 id="prefs-heading">2. How adventurous should it be?</h2>
+      <div className="prefs-lead">
+        <DivergenceSlider value={preferences.divergence} onChange={(v) => set('divergence', v)} />
+      </div>
       <div className="prefs-grid">
         <Slider
           label="Genre strictness"

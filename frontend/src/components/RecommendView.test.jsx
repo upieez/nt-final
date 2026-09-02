@@ -43,7 +43,7 @@ describe('RecommendView', () => {
     expect(url).toBe('/api/v1/recommendations/next-track');
     expect(JSON.parse(init.body)).toEqual({
       sequence: [{ artist: 'Joy Division', title: 'Disorder' }],
-      preferences: { genreStrictness: 0.5, discoveryFactor: 0.5 },
+      preferences: { divergence: 0, genreStrictness: 0.5, discoveryFactor: 0.5 },
       options: { poolMode: 'dynamic', poolSize: 40, alternatives: 5 }
     });
     expect(screen.getByText('Shares post-punk with your most recent track.')).toBeInTheDocument();
