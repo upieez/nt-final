@@ -17,6 +17,8 @@ function TagList({ label, items }) {
 export default function ResultCard({ result, onUseAsSeed }) {
   const { recommendation, score, breakdown, explanation = {}, alternatives = [], diagnostics = {}, candidatePool = {}, warnings = [] } = result;
   const headingRef = useRef(null);
+  const preferenceWarnings = warnings.filter((w) => w.track === '(preferences)');
+  const trackWarnings = warnings.filter((w) => w.track !== '(preferences)');
 
   useEffect(() => {
     if (headingRef.current) headingRef.current.focus();
@@ -77,9 +79,16 @@ export default function ResultCard({ result, onUseAsSeed }) {
         </div>
       )}
 
-      {warnings.length > 0 && (
+      {preferenceWarnings.length > 0 && (
+        <div className="notice notice-warning" role="note">
+          {preferenceWarnings.map((w, i) => (
+            <p key={i}>Genre strictness was ignored for this pick: {w.issue}</p>
+          ))}
+        </div>
+      )}
+      {trackWarnings.length > 0 && (
         <ul className="warnings" aria-label="Warnings">
-          {warnings.map((w, i) => <li key={i}>{w.track}: {w.issue}</li>)}
+          {trackWarnings.map((w, i) => <li key={i}>{w.track}: {w.issue}</li>)}
         </ul>
       )}
 
@@ -87,7 +96,7 @@ export default function ResultCard({ result, onUseAsSeed }) {
         <span>Latency {diagnostics.latencyMs ?? '?'} ms</span>
         <span>Cache hits {diagnostics.cacheHits ?? 0} / misses {diagnostics.cacheMisses ?? 0}</span>
         <span>Upstream calls {diagnostics.upstreamCalls ?? 0}</span>
-        <span>Pool {candidatePool.mode || '?'}, {candidatePool.size ?? '?'} candidates, {candidatePool.scored ?? '?'} scored</span>
+        <span>Pool {candidatePool.mode || '?'}, {candidatePool.size ?? '?'} candidates, {candidatePool.scored ?? '?'} scored, {candidatePool.contrast ?? 0} contrast</span>
       </footer>
     </section>
   );
