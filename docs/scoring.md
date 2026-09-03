@@ -57,7 +57,12 @@ artist-level and describe a whole catalogue.
 - `divergence` (v, default 0): applied first, `raw' = (1 - v) * raw + v * (1 - raw)`. At v = 0 the
   score is untouched; at v = 1 the least similar candidate ranks first; at v = 0.5 every candidate
   scores 0.5 before the popularity penalty, so popularity alone decides. `breakdown.divergence` echoes
-  the value and `breakdown.divergenceApplied` is true when v > 0.
+  the value and `breakdown.divergenceApplied` is true when v > 0. At v >= `DIVERGENCE_THRESHOLD` (0.5)
+  two more things change: the candidate pool also pulls `tag.getTopTracks` (10 each) for the first three
+  tags of a fixed 25-entry broad-genre vocabulary (`CONTRAST_TAGS` in `candidates.js`) that are absent
+  from the sequence tags, reported as `candidatePool.contrast`; and `genreStrictness` is ignored
+  (both the hard filter and the soft damping) with a `(preferences)` warning. `targetGenre` still applies.
+  The explanation summary then says what the pick is instead of, or the one thing it still shares.
 - `discoveryFactor` (d): `popularity = log(listeners + 1) / log(maxListeners + 1)` over the eligible
   pool, `popularityPenalty = raw' * d * popularity`, `score = raw' - popularityPenalty`.
   At d = 1 the most popular candidate scores 0; at d = 0 popularity is ignored.
@@ -75,7 +80,8 @@ Candidates are sorted by `score` descending; ties go to the candidate with fewer
 
 ## Candidate pool accounting
 
-`candidatePool = { mode, size, scored, scoreless, excluded }` where `size` is the pool after
+`candidatePool = { mode, size, scored, scoreless, excluded, contrast }` where `size` is the pool after
 de-duplication and seed removal, `scored` candidates had tags or genres and passed the filters,
 `scoreless` had neither tags nor genres, and `excluded` counts excluded artists, lookup failures and
-candidates dropped by the strictness or target-genre filters.
+candidates dropped by the strictness or target-genre filters, and `contrast` counts candidates that came
+from the unrelated tag charts at high divergence.

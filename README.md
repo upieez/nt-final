@@ -73,19 +73,21 @@ Wikidata 2/s, Last.fm 5/s. Upstream timeout 5 s.
 curl -X POST http://localhost:3000/api/v1/recommendations/next-track \
   -H 'Content-Type: application/json' \
   -d '{"sequence":[{"artist":"Joy Division","title":"Disorder"},{"artist":"The Cure","title":"A Forest"}],
-       "preferences":{"genreStrictness":0.5,"discoveryFactor":0.5,"targetGenre":"post-punk","excludeArtists":["The Cure"]},
+       "preferences":{"genreStrictness":0.5,"discoveryFactor":0.5,"divergence":0,"targetGenre":"post-punk","excludeArtists":["The Cure"]},
        "options":{"poolMode":"dynamic","poolSize":40,"alternatives":5}}'
 ```
 
 Rules: `sequence` has 1 to 10 items with non-empty `artist` and `title` strings of at most 200
-characters (an optional `isrc` is used when present); preference numbers are clamped to [0, 1] with
-defaults 0.5; `targetGenre` is an optional string and `excludeArtists` an optional string array;
+characters (an optional `isrc` is used when present); preference numbers are clamped to [0, 1],
+`genreStrictness` and `discoveryFactor` default to 0.5 and `divergence` to 0 (0 = as similar as
+possible, 1 = something completely different: the score is flipped, unrelated tag charts join the pool
+and strictness is ignored); `targetGenre` is an optional string and `excludeArtists` an optional string array;
 `options.poolMode` is `dynamic` (default) or `fixed`.
 
 Response fields: `recommendation` (artist, title, mbid, wikidataId, listeners, tags), `score`,
-`breakdown` (tagOverlap, genreOverlap, graphSignal, popularityPenalty, recencyWeightApplied),
+`breakdown` (tagOverlap, genreOverlap, graphSignal, popularityPenalty, recencyWeightApplied, divergence, divergenceApplied),
 `explanation` (matchedTags, matchedGenres, sharedRelations, summary), `alternatives`,
-`candidatePool` (mode, size, scored, scoreless, excluded), `seeds` (resolved, mbid, tagSource),
+`candidatePool` (mode, size, scored, scoreless, excluded, contrast), `seeds` (resolved, mbid, tagSource),
 `diagnostics` (latencyMs, cacheHits, cacheMisses, upstreamCalls, matchRate, enrichmentSkipped)
 and `warnings`.
 
