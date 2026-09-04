@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import StudyCard from './StudyCard.jsx';
 import ErrorMessage from './ErrorMessage.jsx';
+import DivergenceSlider from './DivergenceSlider.jsx';
 import { postJson } from '../lib/api.js';
 import { PRESET_SEQUENCES } from '../lib/presets.js';
 import { allRatingsComplete, emptyRatings } from '../lib/study.js';
@@ -31,7 +32,7 @@ function Consent({ onAgree }) {
   );
 }
 
-function SequencePicker({ ownSequence, onStart, loading, error, headingRef }) {
+function SequencePicker({ ownSequence, onStart, loading, error, headingRef, divergence, onDivergenceChange }) {
   const [choice, setChoice] = useState(PRESET_SEQUENCES[0].id);
   const ownAvailable = ownSequence.length > 0;
   const chosen = choice === OWN ? ownSequence : PRESET_SEQUENCES.find((p) => p.id === choice).tracks;
@@ -63,6 +64,9 @@ function SequencePicker({ ownSequence, onStart, loading, error, headingRef }) {
           </li>
         </ul>
       </fieldset>
+      <div className="prefs-lead">
+        <DivergenceSlider value={divergence} onChange={onDivergenceChange} />
+      </div>
       <button type="button" className="btn btn-primary" disabled={loading} onClick={() => onStart(chosen)}>
         {loading ? 'Preparing three candidates...' : 'Get three candidates'}
       </button>
@@ -78,6 +82,7 @@ export default function StudyView({ sequence, preferences }) {
   const [ratings, setRatings] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [divergence, setDivergence] = useState(preferences.divergence);
   const stageRef = useRef(null);
 
   useEffect(() => {
@@ -88,7 +93,7 @@ export default function StudyView({ sequence, preferences }) {
     setLoading(true);
     setError(null);
     try {
-      const prefs = { genreStrictness: preferences.genreStrictness, discoveryFactor: preferences.discoveryFactor };
+      const prefs = { divergence, genreStrictness: preferences.genreStrictness, discoveryFactor: preferences.discoveryFactor };
       const body = await postJson('/api/v1/study/compare', { sequence: seq, preferences: prefs });
       setTrial(body);
       setTrialSequence(seq);
@@ -125,7 +130,10 @@ export default function StudyView({ sequence, preferences }) {
 
   if (stage === 'consent') return <Consent onAgree={() => setStage('pick')} />;
   if (stage === 'pick') {
-    return <SequencePicker ownSequence={sequence} onStart={startTrial} loading={loading} error={error} headingRef={stageRef} />;
+    return (
+      <SequencePicker ownSequence={sequence} onStart={startTrial} loading={loading} error={error}
+        headingRef={stageRef} divergence={divergence} onDivergenceChange={setDivergence} />
+    );
   }
   if (stage === 'thanks') {
     return (

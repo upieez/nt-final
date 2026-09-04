@@ -26,6 +26,15 @@ npm run lint       # ESLint
 npm run build      # production build in dist/
 ```
 
+## Similar or different
+
+The first control in the preferences panel is a divergence slider (`preferences.divergence`,
+0 to 1, default 0). At 0 the most similar candidate wins; at 1 the least similar one does. Past the
+visible midpoint (0.5) the backend ignores genre strictness and pulls extra candidates from unrelated
+genre charts; the result card then shows a warning saying so, a "Divergence" bar in the breakdown,
+and the number of contrast candidates in the diagnostics footer. The rating study has the same
+slider so raters can compare the three systems on a "similar" or a "different" brief.
+
 ## Stateless by design
 
 The client keeps every piece of state in React memory only. There is no localStorage, no cookie,
@@ -49,7 +58,7 @@ src/
   components/
     Header, HealthBadge
     SeedBuilder, TrackSearch, ManualAddForm, SequenceList
-    PreferencesPanel, Slider
+    PreferencesPanel, Slider, DivergenceSlider
     RecommendPanel, RecommendView, ResultCard, ScoreBreakdown, ErrorMessage
     YouTubePlayer
     StudyView, StudyCard
