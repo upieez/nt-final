@@ -1,4 +1,5 @@
 const PARTS = [
+  { key: 'divergence', label: 'Divergence' },
   { key: 'tagOverlap', label: 'Tag overlap' },
   { key: 'genreOverlap', label: 'Genre overlap' },
   { key: 'graphSignal', label: 'Graph signal' },
@@ -28,8 +29,11 @@ export default function ScoreBreakdown({ breakdown }) {
       </ul>
       <p className="small muted">
         {breakdown.recencyWeightApplied
-          ? 'Later tracks in your sequence were weighted more heavily.'
-          : 'All tracks in your sequence were weighted equally.'}
+          ? 'Later tracks in your sequence were weighted more heavily. '
+          : 'All tracks in your sequence were weighted equally. '}
+        {breakdown.divergenceApplied
+          ? 'Similarity was blended toward its opposite, so less similar candidates ranked higher.'
+          : 'Divergence was off, so the most similar candidate wins.'}
       </p>
     </div>
   );

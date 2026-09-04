@@ -1,4 +1,5 @@
 export const DEFAULT_PREFERENCES = {
+  divergence: 0,
   genreStrictness: 0.5,
   discoveryFactor: 0.5,
   targetGenre: '',
@@ -11,9 +12,11 @@ export const DEFAULT_OPTIONS = {
   alternatives: 5
 };
 
-export function clamp01(value) {
+export const DIVERGENCE_THRESHOLD = 0.5;
+
+export function clamp01(value, fallback = 0.5) {
   const n = Number(value);
-  if (Number.isNaN(n)) return 0.5;
+  if (Number.isNaN(n)) return fallback;
   return Math.min(1, Math.max(0, n));
 }
 
@@ -26,10 +29,15 @@ export function addExcludedArtist(list, name) {
 
 export function buildRequest(sequence, preferences, options) {
   const prefs = {
+    divergence: clamp01(preferences.divergence, 0),
     genreStrictness: clamp01(preferences.genreStrictness),
     discoveryFactor: clamp01(preferences.discoveryFactor)
   };
   if (preferences.targetGenre.trim()) prefs.targetGenre = preferences.targetGenre.trim();
   if (preferences.excludeArtists.length > 0) prefs.excludeArtists = preferences.excludeArtists;
   return { sequence, preferences: prefs, options: { ...options } };
+}
+
+export function strictnessIgnored(preferences) {
+  return clamp01(preferences.divergence, 0) >= DIVERGENCE_THRESHOLD;
 }
