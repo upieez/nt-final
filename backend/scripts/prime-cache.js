@@ -12,7 +12,8 @@ const PREFERENCE_VARIANTS = [
   { genreStrictness: 0.5, discoveryFactor: 0.5 },
   { genreStrictness: 0.0, discoveryFactor: 0.0 },
   { genreStrictness: 0.0, discoveryFactor: 0.9 },
-  { genreStrictness: 0.9, discoveryFactor: 0.0 }
+  { genreStrictness: 0.9, discoveryFactor: 0.0 },
+  { genreStrictness: 0.5, discoveryFactor: 0.5, divergence: 1 }
 ];
 
 // The four cases from the preliminary report, used when the evaluation harness file is absent
