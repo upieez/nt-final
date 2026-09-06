@@ -24,12 +24,12 @@ function niceMax(values) {
   return steps.map((s) => s * power).find((s) => s >= max) || max;
 }
 
-function text(x, y, label, attrs = '') {
-  return `<text x="${x}" y="${y}" ${FONT} font-size="12" ${attrs}>${escape(label)}</text>`;
+function text(x, y, label, attrs = '', size = 12) {
+  return `<text x="${x}" y="${y}" ${FONT} font-size="${size}" ${attrs}>${escape(label)}</text>`;
 }
 
 function title(width, label) {
-  return text(width / 2, 24, label, 'text-anchor="middle" font-size="15" font-weight="bold"');
+  return text(width / 2, 24, label, 'text-anchor="middle" font-weight="bold"', 15);
 }
 
 // Horizontal gridlines with tick labels on the left; yMax maps to the top of the plot area
@@ -113,7 +113,7 @@ function boxSummary({ title: label, items, unit = '', width = WIDTH, height = HE
       `<rect x="${left}" y="${y(item.p75)}" width="${boxWidth}" height="${Math.max(1, y(item.p25) - y(item.p75))}" fill="${COLOURS[i % COLOURS.length]}" fill-opacity="0.6" stroke="#333" />`,
       `<line x1="${left}" y1="${y(item.p50)}" x2="${left + boxWidth}" y2="${y(item.p50)}" stroke="#000" stroke-width="2" />`,
       text(cx, area.y + area.h + 18, item.name, 'text-anchor="middle"'),
-      text(cx, area.y + area.h + 34, `p50 ${fmt(item.p50)}${unit}, max ${fmt(item.max)}${unit}`, 'text-anchor="middle" fill="#555" font-size="11"')
+      text(cx, area.y + area.h + 34, `p50 ${fmt(item.p50)}${unit}, max ${fmt(item.max)}${unit}`, 'text-anchor="middle" fill="#555"', 11)
     ].join('');
   });
   return frame(width, height, title(width, label) + yAxis(area, top) + boxes.join(''));
