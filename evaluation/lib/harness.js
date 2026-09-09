@@ -17,14 +17,14 @@ const SENSITIVITY = [
   { parameter: 'divergence', low: 0, high: 1 }
 ];
 
-// Tags, genres and listeners for one track, the inputs every metric needs
+// Tags, genres and listeners for one track; seeds get the full recording lookup like the pipeline does
 function trackDescriber() {
   const memo = new Map();
-  return async (artist, title) => {
+  return async (artist, title, { full = false } = {}) => {
     const key = trackKey(artist, title);
     if (memo.has(key)) return memo.get(key);
     const tagResult = await lastfm.resolveTags(artist, title);
-    const track = await resolveTrack({ artist, title }, { full: true });
+    const track = await resolveTrack({ artist, title }, { full });
     const entity = await resolveArtist(track.artistMbid);
     const described = {
       artist,
@@ -158,7 +158,7 @@ async function poolListenersFor(sequence) {
 async function runSequence(entry, random) {
   const describe = trackDescriber();
   const mostRecent = entry.sequence[entry.sequence.length - 1];
-  const reference = await describe(mostRecent.artist, mostRecent.title);
+  const reference = await describe(mostRecent.artist, mostRecent.title, { full: true });
   const poolListeners = await poolListenersFor(entry.sequence);
   const systems = {
     nexttrack: await runNexttrack(entry.sequence, {}, reference, poolListeners, describe),
