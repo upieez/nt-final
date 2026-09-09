@@ -111,6 +111,38 @@ on an upstream timeout.
 each line holds the timestamp, the three systems with their tracks and the three ratings, and
 nothing that identifies the rater or the session.
 
+## Evaluation
+
+`evaluation/` holds the offline harness, the survey and rating analysers and their jest tests
+(run by `npm test` in `backend/`). Everything runs in-process against the backend modules, never
+over HTTP, and the harness runs with `NEXTTRACK_OFFLINE=1`, so it needs the primed cache snapshot.
+
+```bash
+cd backend
+npm run prime-cache                                   # once, live, with LASTFM_API_KEY set
+npm run harness                                       # offline, writes evaluation/results/
+npm run analyse:survey -- ~/Downloads/survey.csv      # Google Forms export -> results/survey.md
+npm run analyse:ratings                               # evaluation/ratings.jsonl -> results/ratings.md
+```
+
+The harness runs the 40 sequences in `evaluation/seed-sequences.json` (20 genre-coherent,
+10 mixed, 10 with a sparsely tagged track) through NextTrack with default preferences, a seeded
+random baseline (mean over 20 draws) and the most-popular baseline, all over the same candidate
+pool, then reruns NextTrack with `discoveryFactor`, `genreStrictness` and `divergence` at 0 and 1.
+Per sequence it records tag coherence (cosine between the winner's and the most recent seed's
+Last.fm tag vectors), genre continuation (the winner shares a tag or MusicBrainz/Wikidata genre
+with the most recent seed, with a genre-only variant), the winner's popularity percentile within
+the pool, whether each parameter changed the winner, cache-warm latency, the reconciliation match
+rate, seed resolution and pool sizes. `results/results.md` states the Chapter 3 success criteria
+with pass or fail, `results/results.json` holds every number and the four SVG charts sit beside
+them. Sequences that fail are listed with their status code and excluded from the averages.
+
+`analyse-survey.js` matches the sixteen survey questions to CSV columns by keyword, so header
+edits in the form do not break it, and reports counts, Likert means and the three motivation
+checks (shared-account confusion, self-censoring, comfort with stored history). `analyse-ratings.js`
+reads the anonymous study lines, reports per-system means, per-trial preferences and a paired sign
+test of NextTrack against each baseline.
+
 ## Layout
 
 ```
@@ -132,6 +164,13 @@ backend/
   scripts/               prime-cache.js, smoke.sh
   test/                  jest suites and hand-written fixtures
 docs/scoring.md          scoring formula and weights
+evaluation/
+  seed-sequences.json    40 harness sequences, shared with prime-cache
+  run-harness.js         offline harness -> results/
+  analyse-survey.js      survey CSV -> results/survey.md
+  analyse-ratings.js     ratings.jsonl -> results/ratings.md
+  lib/                   metrics, svg writer, csv reader, report writers
+  test/                  jest suites and synthetic fixtures
 ```
 
 ## Frontend

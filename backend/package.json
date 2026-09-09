@@ -7,7 +7,10 @@
     "start": "node server.js",
     "test": "jest --runInBand",
     "prime-cache": "node scripts/prime-cache.js",
-    "smoke": "bash scripts/smoke.sh"
+    "smoke": "bash scripts/smoke.sh",
+    "harness": "node ../evaluation/run-harness.js",
+    "analyse:survey": "node ../evaluation/analyse-survey.js",
+    "analyse:ratings": "node ../evaluation/analyse-ratings.js"
   },
   "dependencies": {
     "axios": "^1.7.7",
