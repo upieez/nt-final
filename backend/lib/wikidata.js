@@ -1,6 +1,6 @@
 const http = require('./http');
 
-// Direct-claim properties fetched for an artist entity, one SPARQL round trip per artist
+// Artist properties to fetch
 const PROPERTIES = { P136: 'genres', P264: 'labels', P495: 'country', P527: 'members', P463: 'memberOf' };
 const ENTITY_PREFIX = 'http://www.wikidata.org/entity/';
 const MUSICBRAINZ_ARTIST_ID = 'P434';
@@ -37,7 +37,7 @@ function pushUnique(list, value) {
   if (value && !list.includes(value)) list.push(value);
 }
 
-// Labels without an English translation come back as the bare QID, which is useless for matching
+// Drop labels without English
 function englishLabel(binding) {
   const label = binding.valueLabel?.value;
   return label && !isValidQid(label) ? label : null;
@@ -55,7 +55,7 @@ function fold(qid, bindings) {
   return relations;
 }
 
-// Returns { status, relations } with relations = { qid, genres[], labels[], country, members[], memberOf[] }
+// Returns { status, relations }
 async function getArtistRelations(qid) {
   if (!isValidQid(qid)) return { status: 'error', message: `Invalid Wikidata id: ${qid}`, relations: null };
   const { status, message, bindings } = await sparql(relationsQuery(qid));
@@ -63,7 +63,7 @@ async function getArtistRelations(qid) {
   return { status: 'ok', relations: fold(qid, bindings) };
 }
 
-// Fallback when MusicBrainz has no Wikidata url-rel: Wikidata stores the MBID as P434
+// Fallback: lookup by MBID (P434)
 async function findArtistByMbid(mbid) {
   const query = `SELECT ?item WHERE { ?item wdt:${MUSICBRAINZ_ARTIST_ID} "${String(mbid).replace(/["\\]/g, '')}" } LIMIT 1`;
   const { status, message, bindings } = await sparql(query);

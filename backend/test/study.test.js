@@ -23,7 +23,7 @@ describe('study endpoints', () => {
     const res = await request(app).post('/api/v1/study/compare').send({ sequence: SEQUENCE, preferences: { discoveryFactor: 0.5 } });
     expect(res.status).toBe(200);
     expect(res.body.items.map((i) => i.slot)).toEqual(['A', 'B', 'C']);
-    for (const item of res.body.items) expect(Object.keys(item).sort()).toEqual(['artist', 'slot', 'title']);
+    for (const item of res.body.items) expect(Object.keys(item).sort()).toEqual(['artist', 'image', 'slot', 'title']);
     const trial = decodeTrial(res.body.trialId);
     expect(Object.values(trial.mapping).map((m) => m.system).sort()).toEqual(['nexttrack', 'popular', 'random']);
     expect(Object.values(trial.mapping).find((m) => m.system === 'nexttrack').title).toBe('Spellbound');

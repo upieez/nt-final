@@ -18,12 +18,12 @@ function round(value) {
   return Number((value || 0).toFixed(4));
 }
 
-// Tags for every candidate in parallel; the rate limiter spaces the Last.fm calls
+// Candidate tags in parallel
 async function fetchCandidateTags(candidates) {
   return Promise.all(candidates.map((c) => lastfm.resolveTags(c.artist, c.title)));
 }
 
-// Canonical ids and artist entities sequentially, skipped once the enrichment budget is spent
+// Entities sequentially, within budget
 async function enrichCandidates(candidates, getArtist, startedAt) {
   const enriched = [];
   let skipped = 0;
@@ -70,7 +70,7 @@ function scoreOne(candidate, tagResult, entity, context) {
   };
 }
 
-// At high divergence strictness is ignored entirely; targetGenre still applies
+// High divergence ignores strictness
 function passesFilters(scored, preferences) {
   if (!scoring.matchesTargetGenre(preferences.targetGenre, scored.tags, scored.genres)) return false;
   if (scoring.highDivergence(preferences.divergence)) return true;
@@ -110,7 +110,7 @@ function buildContext(seeds) {
 }
 
 function alternativesFrom(ranked, count) {
-  return ranked.slice(1, 1 + count).map((s) => ({ artist: s.candidate.artist, title: s.candidate.title, score: round(s.adjustedScore), matchedTags: s.matchedTags }));
+  return ranked.slice(1, 1 + count).map((s) => ({ artist: s.candidate.artist, title: s.candidate.title, score: round(s.adjustedScore), matchedTags: s.matchedTags, image: s.track?.image || null }));
 }
 
 function recommendationFrom(winner) {
@@ -120,6 +120,7 @@ function recommendationFrom(winner) {
     mbid: winner.track?.mbid || null,
     wikidataId: winner.artist.wikidataId || null,
     listeners: winner.listeners,
+    image: winner.track?.image || null,
     tags: topTagNames(winner.tags)
   };
 }
@@ -201,7 +202,7 @@ async function runPipeline({ sequence, preferences, options }, startedAt) {
   };
 }
 
-// Full pipeline: seeds -> pool -> tags + entities -> multi-signal score -> filters -> ranking
+// Full recommendation pipeline
 async function recommend(request) {
   const startedAt = Date.now();
   const { result, stats } = await http.withRequestStats(() => runPipeline(request, startedAt));

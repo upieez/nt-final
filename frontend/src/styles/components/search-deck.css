@@ -1,0 +1,115 @@
+.deck {
+  margin-top: -0.75rem;
+  background: var(--lcd-bg-2);
+  border: 1px solid #000;
+  border-top: none;
+  box-shadow: var(--bevel-in);
+  padding: 0.6rem 0.75rem 0.75rem;
+  font-family: var(--font-lcd);
+  font-size: 1.25rem;
+  color: var(--green);
+  text-transform: uppercase;
+}
+
+.deck-list {
+  list-style: none;
+  margin: 0 0 0.5rem;
+  padding: 0;
+}
+
+.deck-row {
+  display: grid;
+  grid-template-columns: 2.2rem 1fr auto auto;
+  gap: 0.75rem;
+  align-items: baseline;
+  width: 100%;
+  padding: 0.25rem 0.5rem;
+  text-align: left;
+  background: transparent;
+  border: none;
+  border-bottom: 1px dotted rgba(93, 255, 154, 0.18);
+  font: inherit;
+  color: inherit;
+  text-shadow: 0 0 5px var(--green-glow);
+  cursor: pointer;
+}
+.deck-row:hover,
+.deck-row:focus-visible {
+  background: var(--green);
+  color: var(--lcd-ink-inverse);
+  text-shadow: none;
+  outline: none;
+}
+.deck-row:hover .deck-idx,
+.deck-row:hover .deck-artist,
+.deck-row:hover .deck-meta {
+  color: var(--lcd-ink-inverse);
+}
+
+.deck-idx {
+  color: var(--green-dim);
+}
+.deck-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.deck-artist {
+  color: var(--green-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 18rem;
+}
+.deck-meta {
+  color: var(--green-dim);
+  font-size: 1rem;
+}
+.deck-note {
+  margin: 0.25rem 0 0.5rem 0.5rem;
+  color: var(--amber);
+  text-shadow: 0 0 5px var(--amber-glow);
+}
+.deck-keys {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.manual {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: flex-end;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px dotted rgba(93, 255, 154, 0.25);
+}
+.manual-field {
+  flex: 1 1 12rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.lcd-field {
+  width: 100%;
+  padding: 0.25rem 0.5rem;
+  margin: 0;
+  background: var(--lcd-bg);
+  border: 1px solid #000;
+  box-shadow: var(--bevel-in);
+  font: inherit;
+  color: var(--green);
+  caret-color: var(--green);
+  text-shadow: 0 0 5px var(--green-glow);
+}
+
+@media (max-width: 720px) {
+  .deck-row {
+    grid-template-columns: 2rem 1fr;
+  }
+  .deck-artist,
+  .deck-meta {
+    grid-column: 2;
+    max-width: none;
+  }
+}

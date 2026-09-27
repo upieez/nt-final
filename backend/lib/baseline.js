@@ -26,7 +26,6 @@ async function withListeners(candidates) {
   return candidates.map((c, i) => ({ ...c, listeners: infos[i].status === 'ok' ? infos[i].listeners : 0 }));
 }
 
-// Random ignores metadata entirely; popular ranks by listeners so ties fall to pool order
 async function orderByStrategy(strategy, candidates) {
   if (strategy === 'random') return shuffle(candidates).map((c) => ({ ...c, listeners: null }));
   const enriched = await withListeners(candidates);
@@ -43,11 +42,12 @@ async function describeWinner(winner, getArtist) {
     mbid: track.mbid,
     wikidataId: artist.wikidataId || null,
     listeners: winner.listeners ?? track.listeners ?? null,
+    image: track.image || null,
     tags: tagResult.status === 'ok' ? topTagNames(tagResult.tags) : []
   };
 }
 
-async function runBaseline({ sequence, strategy, options, preferences }, startedAt) {
+async function runBaseline({ sequence, strategy, options, preferences }) {
   const { seeds, warnings, getArtist } = await resolveSeeds(sequence);
   const pool = await buildPool({ seeds: sequence, poolMode: options.poolMode, poolSize: options.poolSize, excludeArtists: preferences.excludeArtists });
   if (pool.fallbackReason) warnings.push({ track: '(pool)', issue: `fell back to the fixed candidate pool: ${pool.fallbackReason}` });
@@ -66,10 +66,9 @@ async function runBaseline({ sequence, strategy, options, preferences }, started
   };
 }
 
-// Same seeds and candidate pool as the main pipeline, different selection rule
 async function recommendBaseline(request) {
   const startedAt = Date.now();
-  const { result, stats } = await http.withRequestStats(() => runBaseline(request, startedAt));
+  const { result, stats } = await http.withRequestStats(() => runBaseline(request));
   return { ...result, diagnostics: diagnosticsFrom(stats, startedAt, 0) };
 }
 

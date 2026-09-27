@@ -3,7 +3,7 @@ const http = require('./http');
 const SEARCH_LIMIT = 5;
 const WIKIDATA_URL = /wikidata\.org\/wiki\/(Q\d+)/;
 
-// Returns { status, body } where status is ok, not-found, offline-miss, timeout or error
+// Returns { status, body }
 async function callMusicbrainz(urlPath, params) {
   const result = await http.request('musicbrainz', { path: urlPath, params: { ...params, fmt: 'json' } });
   if (result.status !== 'ok') return { status: result.status, message: result.message, body: null };
@@ -38,7 +38,7 @@ function mapRecording(recording) {
   };
 }
 
-// Recording search by artist and title, ranked by the MusicBrainz relevance score (0-100)
+// Recording search by relevance
 async function searchRecording(artist, title, limit = SEARCH_LIMIT) {
   const query = `artist:${luceneQuote(artist)} AND recording:${luceneQuote(title)}`;
   const { status, message, body } = await callMusicbrainz('recording', { query, limit });
@@ -66,7 +66,7 @@ function wikidataIdFromRelations(relations) {
   return null;
 }
 
-// Artist genres, country and the Wikidata link that unlocks the graph signal
+// Genres, country, Wikidata link
 async function getArtist(mbid) {
   const { status, message, body } = await callMusicbrainz(`artist/${mbid}`, { inc: 'genres+tags+url-rels' });
   if (status !== 'ok') return { artist: null, status, message };

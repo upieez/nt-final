@@ -1,4 +1,3 @@
-// Runs the harness seed sequences live so the committed cache snapshot covers them for offline use
 require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
@@ -16,7 +15,7 @@ const PREFERENCE_VARIANTS = [
   { genreStrictness: 0.5, discoveryFactor: 0.5, divergence: 1 }
 ];
 
-// The four cases from the preliminary report, used when the evaluation harness file is absent
+// Fallback preliminary report cases
 const REPORT_CASES = [
   { name: 'coherent post-punk', sequence: [{ artist: 'Joy Division', title: 'Disorder' }, { artist: 'Siouxsie and the Banshees', title: 'Cities in Dust' }, { artist: 'The Cure', title: 'A Forest' }] },
   { name: 'mixed hip-hop, ambient, metal', sequence: [{ artist: 'Nas', title: 'N.Y. State of Mind' }, { artist: 'Brian Eno', title: 'An Ending (Ascent)' }, { artist: 'Metallica', title: 'Master of Puppets' }] },

@@ -8,7 +8,6 @@ const DEFAULT_TTL_DAYS = 30;
 const DEFAULT_CACHE_FILE = path.join(__dirname, '..', 'data', 'cache', 'snapshot.json');
 const USER_AGENT = 'NextTrack/1.0 (samuelhww@gmail.com)';
 
-// One entry per upstream: base URL, minimum spacing between calls, fixed headers
 const SOURCES = {
   lastfm: { baseUrl: 'https://ws.audioscrobbler.com/2.0/', minIntervalMs: 200, headers: { 'User-Agent': USER_AGENT } },
   musicbrainz: { baseUrl: 'https://musicbrainz.org/ws/2/', minIntervalMs: 1000, headers: { 'User-Agent': USER_AGENT, Accept: 'application/json' } },
@@ -70,7 +69,7 @@ function normaliseValue(value) {
   return value;
 }
 
-// Keys are stable across param order and case so repeat lookups hit the same entry
+// Order- and case-insensitive keys
 function cacheKey(source, urlPath, params) {
   const sorted = Object.keys(params).sort().map((k) => `${k}=${encodeURIComponent(normaliseValue(params[k]))}`);
   return `${source}:${urlPath}:${sorted.join('&')}`;
@@ -93,7 +92,7 @@ function sleep(ms) {
   return ms > 0 ? new Promise((resolve) => setTimeout(resolve, ms)) : Promise.resolve();
 }
 
-// Each source has its own queue so a slow MusicBrainz call never delays Last.fm
+// One queue per source
 function acquireSlot(source) {
   if (!settings.rateLimit) return Promise.resolve();
   const state = limiterState[source] || (limiterState[source] = { nextAt: 0 });
@@ -124,7 +123,7 @@ async function callNetwork(source, urlPath, params, secretParams) {
   return { httpStatus: response.status, body: response.data };
 }
 
-// Returns { status: ok | offline-miss | timeout | error, body, httpStatus, fromCache, source }
+// Returns status, body, cache info
 async function request(source, { path: urlPath = '', params = {}, secretParams = {} }) {
   if (!SOURCES[source]) throw new Error(`Unknown source: ${source}`);
   const key = cacheKey(source, urlPath, params);
@@ -153,7 +152,6 @@ function newStats() {
   return { cacheHits: 0, cacheMisses: 0, upstreamCalls: 0, matchAttempted: 0, matchResolved: 0 };
 }
 
-// Runs fn with a fresh per-request counter set reachable from any nested call
 async function withRequestStats(fn) {
   const stats = newStats();
   const result = await requestContext.run(stats, fn);

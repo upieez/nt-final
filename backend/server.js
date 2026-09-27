@@ -14,7 +14,6 @@ const server = app.listen(PORT, () => {
   console.log(`NextTrack listening on http://localhost:${PORT}${http.isOffline() ? ' (offline mode)' : ''}`);
 });
 
-// Stop accepting connections, let in-flight requests finish, persist the cache, then exit
 function shutdown(signal) {
   console.log(`${signal} received, shutting down`);
   server.close(() => {

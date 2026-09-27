@@ -1,0 +1,71 @@
+:root {
+  --room: #0b0b0a;
+  --chassis: #262625;
+  --chassis-2: #1f1f1e;
+  --chassis-3: #171716;
+  --edge-hi: rgba(255, 255, 255, 0.11);
+  --edge-lo: rgba(0, 0, 0, 0.7);
+  --steel: #8f8e88;
+  --steel-hi: #c9c8c1;
+  --steel-lo: #4b4b48;
+
+  --ink: #d9d7cf;
+  --ink-dim: #8a8983;
+  --silk: #b6b4ab;
+  --silk-dim: #6f6e68;
+
+  --amber: #ffb31f;
+  --amber-hi: #ffd27a;
+  --amber-lo: #a8690c;
+  --amber-glow: rgba(255, 179, 31, 0.55);
+  --green: #5dff9a;
+  --green-dim: #2f8a55;
+  --green-glow: rgba(93, 255, 154, 0.45);
+  --red: #ff5a3c;
+
+  --lcd-bg: #050806;
+  --lcd-bg-2: #0a120c;
+  --lcd-ink-inverse: #031008;
+
+  --font-lcd: "VT323", ui-monospace, monospace;
+  --font-silk: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --font-grot:
+    "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono: "Space Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --maxw: 64rem;
+
+  --bevel-out:
+    inset 0 1px 0 var(--edge-hi), inset 0 -1px 0 var(--edge-lo),
+    0 1px 0 rgba(255, 255, 255, 0.05), 0 2px 4px rgba(0, 0, 0, 0.6);
+  --bevel-in:
+    inset 0 2px 4px rgba(0, 0, 0, 0.85),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.06);
+  --brush: repeating-linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.035) 0 1px,
+    rgba(0, 0, 0, 0.035) 1px 2px,
+    transparent 2px 3px
+  );
+  --well-bg: var(--chassis-2) var(--brush);
+  --well-border: 1px solid #0a0a09;
+  --ridge: repeating-linear-gradient(90deg, #3d3d3b 0 2px, #161615 2px 4px);
+  --ridge-hover: repeating-linear-gradient(
+    90deg,
+    #4a4a48 0 2px,
+    #1a1a19 2px 4px
+  );
+  --screw: radial-gradient(
+    circle at 35% 30%,
+    var(--steel-hi),
+    var(--steel) 40%,
+    var(--steel-lo) 100%
+  );
+
+  --key-face: linear-gradient(180deg, #3a3a38, #2a2a29 55%, #232322);
+  --key-face-hover: linear-gradient(180deg, #454543, #323231 55%, #2a2a29);
+  --key-face-pressed: linear-gradient(180deg, #202020, #262625);
+  --key-shadow-pressed:
+    inset 0 2px 4px rgba(0, 0, 0, 0.7), inset 0 -1px 0 rgba(255, 255, 255, 0.04);
+  --key-ink-amber: #2a1a02;
+}

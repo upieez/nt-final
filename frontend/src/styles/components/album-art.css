@@ -1,0 +1,40 @@
+.art {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  background: #0a0a09;
+}
+
+.art-disc {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(
+      circle at 50% 50%,
+      #0a0a09 0 9%,
+      hsl(var(--disc-hue) 35% 22%) 9.5% 30%,
+      hsl(var(--disc-hue) 30% 16%) 30.5% 31%,
+      #141413 31.5% 33%,
+      hsl(var(--disc-hue) 20% 12%) 33.5% 100%
+    ),
+    repeating-radial-gradient(
+      circle at 50% 50%,
+      rgba(255, 255, 255, 0.05) 0 1px,
+      transparent 1px 4px
+    );
+}
+
+.art-disc-label {
+  font-family: var(--font-silk);
+  font-weight: 700;
+  font-size: 1.4rem;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.55);
+  transform: translateY(-1.3em);
+}
+.art-large .art-disc-label {
+  font-size: 2.4rem;
+}

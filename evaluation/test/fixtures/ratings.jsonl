@@ -3,4 +3,3 @@
 {"ratedAt": "2026-09-10T10:10:00.000Z", "results": [{"system": "random", "artist": "R", "title": "r", "coherence": 1, "novelty": 5, "wouldPlay": false}, {"system": "nexttrack", "artist": "N", "title": "n", "coherence": 3, "novelty": 4, "wouldPlay": false}, {"system": "popular", "artist": "P", "title": "p", "coherence": 3, "novelty": 1, "wouldPlay": true}]}
 {"ratedAt": "2026-09-11T09:00:00.000Z", "results": [{"system": "random", "artist": "R", "title": "r", "coherence": 2, "novelty": 3, "wouldPlay": false}, {"system": "nexttrack", "artist": "N", "title": "n", "coherence": 4, "novelty": 2, "wouldPlay": true}, {"system": "popular", "artist": "P", "title": "p", "coherence": 5, "novelty": 1, "wouldPlay": true}]}
 {"ratedAt":"2026-09-11T09:30:00.000Z","results":[{"system":"nexttrack","coherence":5}]}
-not json at all

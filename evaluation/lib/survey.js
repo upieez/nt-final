@@ -1,7 +1,6 @@
 const m = require('./metrics');
 const svg = require('./svg');
 
-// Questions from report/sources/nexttrack-user-survey.md; headers are matched on keywords, not exact wording
 const QUESTIONS = [
   { id: 'Q1', label: 'How often do you listen to music', type: 'choice', keywords: [/how often/] },
   { id: 'Q2', label: 'Services used to listen', type: 'checkbox', keywords: [/use to listen/, /which of these do you use/], options: ['Spotify', 'Apple Music', 'YouTube / YouTube Music', 'Bandcamp / SoundCloud', 'Radio', 'Local files / downloads'] },

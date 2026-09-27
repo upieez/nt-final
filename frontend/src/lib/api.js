@@ -36,6 +36,22 @@ export function searchTracks(query, signal) {
   return request(`/api/v1/tracks/search?q=${q}`, { signal });
 }
 
+export function getTrackInfo(track, signal) {
+  const artist = encodeURIComponent(track.artist);
+  const title = encodeURIComponent(track.title);
+  return request(`/api/v1/tracks/info?artist=${artist}&title=${title}`, { signal });
+}
+
+export function getVideo(track, signal) {
+  const artist = encodeURIComponent(track.artist);
+  const title = encodeURIComponent(track.title);
+  return request(`/api/v1/tracks/video?artist=${artist}&title=${title}`, { signal });
+}
+
+export function getHealth() {
+  return request('/health');
+}
+
 export function postJson(path, payload) {
   return request(path, { method: 'POST', body: JSON.stringify(payload) });
 }

@@ -1,6 +1,5 @@
 const { sameName, normaliseName } = require('./reconcile');
 
-// Signal weights, documented with the formula in docs/scoring.md
 const W_TAG = 0.5;
 const W_GENRE = 0.3;
 const W_GRAPH = 0.2;
@@ -9,10 +8,10 @@ const RECENCY_BASE = 0.6;
 const STRICTNESS_THRESHOLD = 0.7;
 const SOFT_STRICTNESS = 0.5;
 const DIVERGENCE_THRESHOLD = 0.5;
-// Artist tags describe a whole catalogue, so they count as weaker evidence than track tags
+// Artist tags count less
 const ARTIST_TAG_CONFIDENCE = 0.6;
 
-// Scale tag weights so each track's tags sum to 1
+// Tag weights sum to 1
 function normaliseTags(tags) {
   const map = new Map();
   if (!tags || tags.length === 0) return map;
@@ -31,7 +30,7 @@ function addWeighted(target, source, factor) {
   for (const [key, weight] of source) target.set(key, (target.get(key) || 0) + weight * factor);
 }
 
-// Keys are normalised for matching; the first original spelling is kept for display
+// Normalised keys, original display
 function uniformSet(names) {
   const map = new Map();
   const display = new Map();
@@ -44,7 +43,7 @@ function uniformSet(names) {
   return map;
 }
 
-// Seeds are ordered least recent to most recent; weight decays by 0.6 per step back
+// Recency decay 0.6 per step
 function buildSequenceTagSet(resolvedSeeds) {
   const sequenceTagWeights = new Map();
   let mostRecentTags = new Map();
@@ -56,7 +55,7 @@ function buildSequenceTagSet(resolvedSeeds) {
   return { sequenceTagWeights, mostRecentTags };
 }
 
-// Genres from MusicBrainz and Wikidata are unweighted, so each seed's genres share its recency weight equally
+// Genres share seed recency weight
 function buildSequenceGenreSet(resolvedSeeds) {
   const sequenceGenreWeights = new Map();
   let mostRecentGenres = new Map();
@@ -74,7 +73,7 @@ function magnitude(map) {
   return Math.sqrt(sum);
 }
 
-// Cosine similarity between the candidate tag vector and the recency-weighted sequence tag vector
+// Tag cosine similarity
 function scoreCandidate(candidateTags, sequenceTagWeights, mostRecentTags, candidateConfidence = 1) {
   const normalised = normaliseTags(candidateTags);
   let dot = 0;
@@ -93,7 +92,7 @@ function scoreCandidate(candidateTags, sequenceTagWeights, mostRecentTags, candi
   return { tagOverlap, matchedTags, overlapsMostRecent };
 }
 
-// Share of the sequence's recency-weighted genre mass that the candidate covers
+// Covered share of genre mass
 function scoreGenres(candidateGenres, sequenceGenreWeights, mostRecentGenres) {
   const candidate = uniformSet(candidateGenres);
   let total = 0;
@@ -127,7 +126,7 @@ function memberRelation(candidate, seed) {
   return null;
 }
 
-// Relations between one candidate artist and one seed artist, each type at most once
+// Relations for one artist pair
 function relationsBetween(candidate, seed) {
   if (!candidate || !seed || !candidate.name || !seed.name) return [];
   if (candidate.mbid && candidate.mbid === seed.mbid) return [{ type: 'artist', value: seed.name }];
@@ -140,7 +139,7 @@ function relationsBetween(candidate, seed) {
   return relations;
 }
 
-// Recency-weighted mean of per-seed relation strength, each pair capped at 1
+// Recency-weighted mean relation strength
 function scoreGraph(candidateArtist, seedArtists) {
   const sharedRelations = [];
   let total = 0;
@@ -160,7 +159,7 @@ function combineSignals({ tagOverlap, genreOverlap, graphSignal }) {
   return W_TAG * tagOverlap + W_GENRE * genreOverlap + W_GRAPH * graphSignal;
 }
 
-// Blends similarity toward its complement so at divergence 1 the least similar candidate ranks first
+// Divergence inverts similarity
 function applyDivergence(rawScore, divergence) {
   return (1 - divergence) * rawScore + divergence * (1 - rawScore);
 }
@@ -174,14 +173,14 @@ function normalisePopularity(listeners, maxListeners) {
   return Math.log((listeners || 0) + 1) / Math.log(maxListeners + 1);
 }
 
-// Penalty is proportional to the raw score so it scales instead of flattening
+// Proportional popularity penalty
 function applyDiscoveryPenalty(rawScore, listeners, maxListeners, discoveryFactor) {
   const normalisedPopularity = normalisePopularity(listeners, maxListeners);
   const popularityPenalty = rawScore * discoveryFactor * normalisedPopularity;
   return { adjustedScore: rawScore - popularityPenalty, popularityPenalty, normalisedPopularity };
 }
 
-// Below the hard threshold strictness still damps candidates that ignore the most recent seed
+// Soft strictness damping
 function applyStrictness(score, overlapsMostRecent, genreStrictness) {
   if (overlapsMostRecent || genreStrictness >= STRICTNESS_THRESHOLD) return score;
   return score * (1 - genreStrictness * SOFT_STRICTNESS);
@@ -194,7 +193,7 @@ function matchesTargetGenre(targetGenre, tags, genres) {
   return names.some((n) => normaliseName(n) === target);
 }
 
-// Ties go to the less popular candidate
+// Ties favour less popular
 function rankCandidates(scored) {
   return [...scored].sort((a, b) => {
     if (b.adjustedScore !== a.adjustedScore) return b.adjustedScore - a.adjustedScore;

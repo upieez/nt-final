@@ -1,4 +1,4 @@
-// Builders that produce upstream response bodies in the exact shapes the real APIs use
+// Realistic upstream response builders
 
 function lastfmTags(tags) {
   return { toptags: { tag: tags.map(([name, count]) => ({ count, name, url: `https://www.last.fm/tag/${encodeURIComponent(name)}` })), '@attr': {} } };

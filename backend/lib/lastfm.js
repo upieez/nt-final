@@ -2,7 +2,7 @@ const http = require('./http');
 
 const NOT_FOUND_CODE = 6;
 
-// Returns { status, body } where status is ok, not-found, offline-miss, timeout or error
+// Returns { status, body }
 async function callLastfm(params) {
   const result = await http.request('lastfm', {
     params: { ...params, format: 'json', autocorrect: 1 },
@@ -36,12 +36,12 @@ function getTopTags(artist, title) {
   return fetchTags({ method: 'track.gettoptags', artist, track: title });
 }
 
-// Artist-level tags are the coverage backstop for the 54% no-tag rate seen at track level
+// Artist tags as coverage backstop
 function getArtistTopTags(artist) {
   return fetchTags({ method: 'artist.gettoptags', artist });
 }
 
-// Track tags first, artist tags as fallback; tagSource records which level was used
+// Track tags, else artist tags
 async function resolveTags(artist, title) {
   const trackResult = await getTopTags(artist, title);
   if (trackResult.status === 'ok') return { tags: trackResult.tags, status: 'ok', tagSource: 'track' };
@@ -56,7 +56,7 @@ function emptyMbid(value) {
   return typeof value === 'string' && value.length > 0 ? value : null;
 }
 
-// Autocorrected names and MBID hints feed reconciliation; listeners feed the popularity penalty
+// Corrected names, MBID, listeners
 async function getTrackInfo(artist, title) {
   const { status, message, body } = await callLastfm({ method: 'track.getinfo', artist, track: title });
   if (status !== 'ok') return { listeners: null, status, message };
@@ -68,8 +68,22 @@ async function getTrackInfo(artist, title) {
     correctedArtist: track.artist?.name || artist,
     correctedTitle: track.name || title,
     mbid: emptyMbid(track.mbid),
-    artistMbid: emptyMbid(track.artist?.mbid)
+    artistMbid: emptyMbid(track.artist?.mbid),
+    image: albumImage(track),
+    album: track.album?.title || null
   };
+}
+
+const IMAGE_SIZES = ['extralarge', 'large', 'medium', 'small'];
+
+// Largest non-empty album image
+function albumImage(track) {
+  const images = asArray(track.album?.image);
+  for (const size of IMAGE_SIZES) {
+    const hit = images.find((i) => i.size === size && typeof i['#text'] === 'string' && i['#text'].length > 0);
+    if (hit) return hit['#text'];
+  }
+  return null;
 }
 
 function mapSimilarTrack(t) {
@@ -98,7 +112,7 @@ async function getArtistTopTracks(artist, limit = 5) {
   return { tracks: asArray(body.toptracks?.track).map(mapTopTrack).filter((t) => t.artist && t.title), status: 'ok' };
 }
 
-// Tag charts carry no listener counts, so contrast candidates get their popularity from track.getInfo later
+// No listener counts here
 async function getTagTopTracks(tag, limit = 10) {
   const { status, message, body } = await callLastfm({ method: 'tag.gettoptracks', tag, limit });
   if (status !== 'ok') return { tracks: null, status, message };

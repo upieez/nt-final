@@ -1,4 +1,4 @@
-export const MAX_SEQUENCE = 10;
+export const MAX_SEQUENCE = 5;
 
 function sameTrack(a, b) {
   return a.artist.trim().toLowerCase() === b.artist.trim().toLowerCase()

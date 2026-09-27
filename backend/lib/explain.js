@@ -20,7 +20,6 @@ function relationPhrase(type, value, withNames) {
   }
 }
 
-// Relations of the same type and value against several seeds collapse into one phrase
 function relationPhrases(sharedRelations) {
   const groups = new Map();
   for (const r of sharedRelations) {
@@ -34,7 +33,6 @@ function relationPhrases(sharedRelations) {
     .filter(Boolean);
 }
 
-// At high divergence the sentence says what the pick is instead of, or the one thing it still shares
 function buildDivergentSummary({ matchedTags, matchedGenres, candidateTags, recentTags, mostRecentArtist }) {
   const own = topTagNames(candidateTags).slice(0, 3);
   const recent = topTagNames(recentTags).slice(0, 3);
@@ -46,7 +44,6 @@ function buildDivergentSummary({ matchedTags, matchedGenres, candidateTags, rece
   return `${lead}${contrast}, still sharing ${joinNames(shared.slice(0, 3))}.`;
 }
 
-// One human sentence built from the strongest evidence, tags first, then genres, then graph relations
 function buildSummary({ matchedTags, matchedGenres, sharedRelations, mostRecentArtist, divergence = 0, candidateTags = [], recentTags = [] }) {
   if (highDivergence(divergence)) return buildDivergentSummary({ matchedTags, matchedGenres, candidateTags, recentTags, mostRecentArtist });
   const parts = [];

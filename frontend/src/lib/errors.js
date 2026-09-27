@@ -1,4 +1,5 @@
 const MESSAGES = {
+  404: 'The server answered but the endpoint is missing. Restart the backend.',
   0: 'Could not reach the NextTrack server. Check that the backend is running on port 3000.',
   400: 'The request was not valid. Check the sequence and preferences and try again.',
   422: 'The tracks in your sequence could not be identified in the music databases, so there is nothing to recommend from. Check spelling or try different tracks.',

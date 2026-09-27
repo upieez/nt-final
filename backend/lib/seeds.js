@@ -5,7 +5,7 @@ const { ARTIST_TAG_CONFIDENCE } = require('./scoring');
 
 const label = (t) => `${t.artist} - ${t.title}`;
 
-// Artist entities are shared across seeds and candidates within one request
+// Artist cache per request
 function artistMemo() {
   const memo = new Map();
   return (mbid) => {
@@ -28,7 +28,7 @@ function tagIssue(result) {
   }[result.status] || result.message || 'Last.fm lookup failed';
 }
 
-// One seed: canonical ids, Last.fm tags with artist fallback, artist entity and merged genres
+// Resolves one seed fully
 async function resolveSeed(item, getArtist) {
   const track = await resolveTrack(item, { full: true });
   const tagResult = await lastfm.resolveTags(item.artist, item.title);
@@ -66,11 +66,12 @@ function seedSummary(seed) {
     title: seed.track.title,
     resolved: seed.usable,
     mbid: seed.track.mbid,
+    image: seed.track.image || null,
     tagSource: seed.tagSource
   };
 }
 
-// Pick the error class from what actually went wrong: timeout beats error beats plain not-found
+// Timeout, then error, then not-found
 function failureError(failures) {
   const timeout = failures.find((f) => f.status === 'timeout');
   if (timeout) return upstreamError(timeout);

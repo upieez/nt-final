@@ -1,0 +1,35 @@
+.silk,
+.silk-h,
+.fader-label,
+.key,
+.mode-btn,
+.slot-caption,
+.slot-flag,
+.eject,
+.lamp-row,
+.fader-cap {
+  font-family: var(--font-silk);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+  font-size: 0.7rem;
+  color: var(--silk);
+}
+
+.silk-dim {
+  color: var(--silk-dim);
+}
+
+.silk-h {
+  font-size: 0.78rem;
+  letter-spacing: 0.2em;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.silk-h::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--steel-lo), transparent);
+}

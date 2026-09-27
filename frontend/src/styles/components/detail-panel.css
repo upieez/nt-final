@@ -1,0 +1,97 @@
+.detail {
+  margin-top: 0.75rem;
+  padding: 0.9rem 1rem 1rem;
+  background: var(--lcd-bg-2);
+  border: 1px solid #000;
+  box-shadow: var(--bevel-in);
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--green);
+}
+
+.detail .silk-h {
+  color: var(--green-dim);
+  margin-bottom: 0.5rem;
+}
+.detail .silk-h::after {
+  background: linear-gradient(90deg, var(--green-dim), transparent);
+}
+.detail .silk {
+  color: var(--green-dim);
+  display: block;
+  margin-bottom: 0.3rem;
+}
+.detail .dim {
+  color: var(--green-dim);
+}
+
+.detail-score {
+  margin: 0 0 0.6rem;
+}
+.detail-row {
+  margin-top: 0.75rem;
+}
+
+.tags,
+.relations,
+.alts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+.tag {
+  padding: 0.05rem 0.45rem;
+  border: 1px solid rgba(93, 255, 154, 0.35);
+}
+
+.relation-type {
+  text-transform: uppercase;
+  color: var(--green-dim);
+}
+
+.alt {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  padding: 0.3rem 0.5rem;
+  background: transparent;
+  border: none;
+  border-bottom: 1px dotted rgba(93, 255, 154, 0.2);
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.alt:hover,
+.alt:focus-visible {
+  background: var(--green);
+  color: var(--lcd-ink-inverse);
+  outline: none;
+}
+.alt:hover .dim {
+  color: var(--lcd-ink-inverse);
+}
+
+.warnings {
+  margin: 0.75rem 0 0;
+  padding-left: 1.2rem;
+  color: var(--amber);
+}
+
+.diag {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.25rem;
+  margin-top: 0.9rem;
+  padding-top: 0.5rem;
+  border-top: 1px dotted rgba(93, 255, 154, 0.25);
+  color: var(--green-dim);
+  font-size: 0.7rem;
+}

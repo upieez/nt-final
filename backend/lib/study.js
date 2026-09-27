@@ -22,7 +22,7 @@ function sign(payload) {
   return crypto.createHmac('sha256', secret()).update(payload).digest('base64url');
 }
 
-// The slot-to-system mapping lives only inside the signed id, so the server keeps no trial state
+// Slot mapping lives in id
 function encodeTrial(mapping) {
   const payload = Buffer.from(JSON.stringify({ mapping, issuedAt: Date.now() })).toString('base64url');
   return `${payload}.${sign(payload)}`;
@@ -49,7 +49,7 @@ function shuffledSystems() {
   return systems;
 }
 
-// Three recommendations over the same seeds, returned in a random slot order without system names
+// Three shuffled, unlabelled recommendations
 async function createTrial({ sequence, preferences, options }) {
   const results = {
     nexttrack: await recommend({ sequence, preferences, options }),
@@ -59,8 +59,9 @@ async function createTrial({ sequence, preferences, options }) {
   const order = shuffledSystems();
   const mapping = {};
   const items = SLOTS.map((slot, i) => {
-    mapping[slot] = { system: order[i], artist: results[order[i]].recommendation.artist, title: results[order[i]].recommendation.title };
-    return { slot, artist: mapping[slot].artist, title: mapping[slot].title };
+    const rec = results[order[i]].recommendation;
+    mapping[slot] = { system: order[i], artist: rec.artist, title: rec.title };
+    return { slot, artist: rec.artist, title: rec.title, image: rec.image || null };
   });
   return { trialId: encodeTrial(mapping), items };
 }
@@ -85,7 +86,7 @@ function validateRatings(ratings) {
   return details;
 }
 
-// Appends one anonymous line: system, track and the three ratings, nothing about the rater
+// Appends one anonymous rating line
 function recordRatings({ trialId, ratings }) {
   const trial = decodeTrial(trialId);
   const details = trial ? validateRatings(ratings) : ['trialId is missing or has an invalid signature'];

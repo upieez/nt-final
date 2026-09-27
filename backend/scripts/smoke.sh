@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Curl examples against a running server; BASE defaults to localhost:3000
+# Curl examples; BASE overridable
 set -euo pipefail
 BASE="${BASE:-http://localhost:3000}"
 JSON='Content-Type: application/json'

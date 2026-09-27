@@ -17,7 +17,7 @@ Web Design, Project Idea 2 (7.2), NextTrack: A music recommendation API.
    capped at `poolSize` (default 40, max 80). A bundled 46-track pool is the `fixed` fallback.
 3. Each candidate is scored on tag overlap, genre overlap and a graph signal (shared label, country,
    member or collaboration links), recency-weighted toward the most recent seed, then the discovery
-   penalty and genre strictness are applied. The formula and weights are in [docs/scoring.md](docs/scoring.md).
+   penalty and genre strictness are applied.
 4. Every upstream call goes through one cached HTTP layer with per-source rate limits, so repeated
    requests are served from `backend/data/cache/snapshot.json` and the whole API can run offline.
 
@@ -50,17 +50,16 @@ cache" and stale entries are still served. `npm run smoke` prints curl examples 
 
 ### Environment variables
 
-| Variable | Default | Purpose |
-|---|---|---|
-| `LASTFM_API_KEY` | required unless offline | Last.fm API key |
-| `PORT` | 3000 | listen port |
-| `NEXTTRACK_OFFLINE` | 0 | `1` serves only from the cache snapshot |
-| `NEXTTRACK_CACHE_FILE` | `backend/data/cache/snapshot.json` | cache snapshot location |
-| `NEXTTRACK_CACHE_TTL_DAYS` | 30 | days before a cached response is refetched |
-| `NEXTTRACK_ENRICH_BUDGET_MS` | 25000 | MusicBrainz/Wikidata time budget per request |
-| `STUDY_SECRET` | dev default | HMAC key for blind study trial ids |
-| `CORS_ORIGIN` | any | allowed browser origin |
-| `RATINGS_FILE` | `evaluation/ratings.jsonl` | where study ratings are appended |
+| Variable                     | Default                            | Purpose                                      |
+| ---------------------------- | ---------------------------------- | -------------------------------------------- |
+| `LASTFM_API_KEY`             | required unless offline            | Last.fm API key                              |
+| `PORT`                       | 3000                               | listen port                                  |
+| `NEXTTRACK_OFFLINE`          | 0                                  | `1` serves only from the cache snapshot      |
+| `NEXTTRACK_CACHE_FILE`       | `backend/data/cache/snapshot.json` | cache snapshot location                      |
+| `NEXTTRACK_CACHE_TTL_DAYS`   | 30                                 | days before a cached response is refetched   |
+| `NEXTTRACK_ENRICH_BUDGET_MS` | 25000                              | MusicBrainz/Wikidata time budget per request |
+| `STUDY_SECRET`               | dev default                        | HMAC key for blind study trial ids           |
+| `CORS_ORIGIN`                | any                                | allowed browser origin                       |
 
 Rate limits: MusicBrainz 1 request/s with `User-Agent: NextTrack/1.0 (samuelhww@gmail.com)`,
 Wikidata 2/s, Last.fm 5/s. Upstream timeout 5 s.
@@ -99,17 +98,15 @@ on an upstream timeout.
 
 - `GET /health` -> `{ status: "ok", offline: bool }`
 - `GET /api/v1/tracks/search?q=` -> `{ results: [{ artist, title, listeners }] }` (Last.fm track.search, max 8)
+- `GET /api/v1/tracks/info?artist=&title=` -> `{ artist, title, found, image, album, listeners }` (Last.fm track.getInfo
+  via the shared cache; `image` is the largest album cover URL or null, and the frontend uses it for seed slot art)
+- `GET /api/v1/tracks/video?artist=&title=` -> `{ videoId, searchUrl }` (top hit on the YouTube results page, kept in
+  memory only; `videoId` is null when nothing was found and the frontend then offers the search link instead)
 - `POST /api/v1/recommendations/baseline` body `{ sequence, strategy: "random" | "popular", options }` ->
   the next-track response shape without `breakdown`, with `strategy` set, over the same candidate pool
-- `POST /api/v1/study/compare` body `{ sequence, preferences }` -> `{ trialId, items: [{ slot, artist, title }] }`,
+- `POST /api/v1/study/compare` body `{ sequence, preferences }` -> `{ trialId, items: [{ slot, artist, title, image }] }`,
   the NextTrack, random and popular picks in a shuffled order; the slot-to-system mapping lives only
   inside the HMAC-signed `trialId`, the server keeps no trial state
-- `POST /api/v1/study/rate` body `{ trialId, ratings: { A: { coherence, novelty, wouldPlay }, B, C } }` ->
-  `{ ok: true }` after appending one line to `evaluation/ratings.jsonl`
-
-`evaluation/ratings.jsonl` is study instrumentation for the blind rating mode, not user tracking:
-each line holds the timestamp, the three systems with their tracks and the three ratings, and
-nothing that identifies the rater or the session.
 
 ## Evaluation
 
@@ -163,7 +160,6 @@ backend/
   data/cache/            committed cache snapshot
   scripts/               prime-cache.js, smoke.sh
   test/                  jest suites and hand-written fixtures
-docs/scoring.md          scoring formula and weights
 evaluation/
   seed-sequences.json    40 harness sequences, shared with prime-cache
   run-harness.js         offline harness -> results/

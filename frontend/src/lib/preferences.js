@@ -20,6 +20,15 @@ export function clamp01(value, fallback = 0.5) {
   return Math.min(1, Math.max(0, n));
 }
 
+// Similarity mirrors divergence
+export function similarityFrom(divergence) {
+  return Number((1 - clamp01(divergence, 0)).toFixed(2));
+}
+
+export function divergenceFrom(similarity) {
+  return Number((1 - clamp01(similarity, 1)).toFixed(2));
+}
+
 export function addExcludedArtist(list, name) {
   const clean = name.trim();
   if (!clean) return list;
@@ -35,7 +44,7 @@ export function buildRequest(sequence, preferences, options) {
   };
   if (preferences.targetGenre.trim()) prefs.targetGenre = preferences.targetGenre.trim();
   if (preferences.excludeArtists.length > 0) prefs.excludeArtists = preferences.excludeArtists;
-  return { sequence, preferences: prefs, options: { ...options } };
+  return { sequence: sequence.map((t) => ({ artist: t.artist, title: t.title })), preferences: prefs, options: { ...options } };
 }
 
 export function strictnessIgnored(preferences) {

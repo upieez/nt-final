@@ -12,7 +12,6 @@ const SIMILAR_ARTISTS_PER_SEED = 5;
 const TOP_TRACKS_PER_ARTIST = 5;
 const CONTRAST_TAG_COUNT = 3;
 const CONTRAST_TRACKS_PER_TAG = 10;
-// Broad Last.fm genre tags used to pull in deliberately unrelated candidates at high divergence
 const CONTRAST_TAGS = [
   'hip-hop', 'electronic', 'jazz', 'classical', 'metal', 'folk', 'country', 'blues', 'reggae', 'punk',
   'soul', 'funk', 'ambient', 'techno', 'house', 'pop', 'rock', 'indie', 'rnb', 'latin', 'world music',
@@ -30,7 +29,7 @@ function noteFailure(failures, source, status) {
   if (status === 'timeout' || status === 'error') failures.push({ source, status });
 }
 
-// Similar tracks first, then top tracks of similar artists, both in Last.fm rank order
+// Similar tracks, then similar artists
 async function gatherForSeed(seed, failures) {
   const list = [];
   const similar = await lastfm.getSimilarTracks(seed.artist, seed.title, SIMILAR_TRACKS_PER_SEED);
@@ -46,7 +45,7 @@ async function gatherForSeed(seed, failures) {
   return list;
 }
 
-// The first vocabulary tags absent from the sequence, in a fixed order so results are reproducible
+// Unseen vocabulary tags, fixed order
 function pickContrastTags(sequenceTags) {
   const present = new Set([...(sequenceTags || [])].map(normaliseName));
   return CONTRAST_TAGS.filter((tag) => !present.has(normaliseName(tag))).slice(0, CONTRAST_TAG_COUNT);
@@ -62,7 +61,7 @@ async function gatherContrast(sequenceTags, failures) {
   return list;
 }
 
-// Round-robin across seeds so one seed with many neighbours cannot crowd the others out
+// Round-robin keeps seeds balanced
 function interleave(lists) {
   const merged = [];
   const longest = Math.max(0, ...lists.map((l) => l.length));
@@ -102,7 +101,7 @@ function fixedPool(seeds, excludeArtists, cap, fallbackReason) {
   return { mode: 'fixed', ...dedupe(items, seeds, excludeArtists, cap), contrast: 0, fallbackReason, failures: [] };
 }
 
-// Returns { mode, candidates[], excluded, contrast, fallbackReason, failures[] }
+// Builds the candidate pool
 async function buildPool({ seeds, poolMode = 'dynamic', poolSize, excludeArtists = [], divergence = 0, sequenceTags = [] }) {
   const cap = clampPoolSize(poolSize);
   if (poolMode === 'fixed') return fixedPool(seeds, excludeArtists, cap, null);

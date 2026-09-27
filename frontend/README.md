@@ -2,12 +2,14 @@
 
 A small React client for the NextTrack API. It has two views:
 
-- **Recommend**: build a listening sequence (search or type artist and title), set preferences,
-  ask for the next track, and read the explanation of why it was chosen. The recommended track can
-  be played through an embedded YouTube search player and added back into the sequence to continue.
+- **Recommend**: the front panel of a 1990s hi-fi separate. Load up to five seed tracks into the
+  slots (press + and type into the LCD, or use MANUAL), set the SIMILARITY, DISCOVERY and STRICTNESS
+  faders, press PLAY. The CD tray slides out with the recommended track, its cover, a one-line reason,
+  and LISTEN (YouTube), NEXT (load it as the newest seed) and DETAIL (score breakdown, tags, relations,
+  alternatives, warnings, diagnostics).
 - **Rating study**: a blind comparison. The rater sees three candidate next tracks (NextTrack,
   random and most-popular, shuffled and unlabelled), rates each one, and submits. Ratings are
-  anonymous and are appended by the backend to `evaluation/ratings.jsonl` as study instrumentation.
+  anonymous and are appended by the backend as study instrumentation.
 
 ## Running
 
@@ -26,14 +28,18 @@ npm run lint       # ESLint
 npm run build      # production build in dist/
 ```
 
-## Similar or different
+## The faders
 
-The first control in the preferences panel is a divergence slider (`preferences.divergence`,
-0 to 1, default 0). At 0 the most similar candidate wins; at 1 the least similar one does. Past the
-visible midpoint (0.5) the backend ignores genre strictness and pulls extra candidates from unrelated
-genre charts; the result card then shows a warning saying so, a "Divergence" bar in the breakdown,
-and the number of contrast candidates in the diagnostics footer. The rating study has the same
-slider so raters can compare the three systems on a "similar" or a "different" brief.
+SIMILARITY is the inverse of the API's `preferences.divergence` (fader at 1.00 sends divergence 0).
+Below the midpoint the backend ignores genre strictness and pulls extra candidates from unrelated
+genre charts; the STRICTNESS readout then shows `--` and its BYPASS lamp lights. DISCOVERY is
+`discoveryFactor` and STRICTNESS is `genreStrictness`. Target genre, excluded artists and the
+candidate pool mode are not on the panel and use the API defaults. The rating study has the same
+SIMILARITY fader so raters can compare the three systems on a "similar" or a "different" brief.
+
+Album art comes from `GET /api/v1/tracks/info` (Last.fm album images through the backend cache)
+and from the `image` field on recommendations, alternatives and study items. A track with no cover
+gets a printed disc label with its initials.
 
 ## Stateless by design
 
@@ -45,35 +51,25 @@ to the API carries everything the API needs, which is the point of the project.
 
 ```
 src/
-  App.jsx                 hash routing between the two views, shared sequence and preference state
-  styles.css              all styling, CSS variables, light and dark via prefers-color-scheme
+  App.jsx                 chassis, brand plate, RECOMMEND / STUDY mode keys, hash routing, shared state
+  styles.css              the whole front panel: charcoal chassis, LCD, slots, faders, PLAY, tray
   lib/
-    api.js                fetch wrapper, ApiError with status and parsed body
-    sequence.js           pure helpers for add, move, remove (max 10 tracks)
-    preferences.js        defaults, clamping to [0,1], request builder matching the API contract
-    errors.js             HTTP status to plain-language message mapping
+    api.js                fetch wrapper, ApiError, search, track info and health calls
+    sequence.js           pure helpers for add, move, remove (max 5 tracks)
+    preferences.js        defaults, clamping, similarity <-> divergence, request builder
+    errors.js             HTTP status to plain-language message mapping (shown on the LCD)
     presets.js            six preset seed sequences for the rating study
     study.js              rating state helpers
+    useArt.js             album art per track, fetched once and kept in memory
+    useHealth.js          backend health for the LCD link readout
     useRecommendation.js  loading, error and result state for the next-track call
   components/
-    Header, HealthBadge
-    SeedBuilder, TrackSearch, ManualAddForm, SequenceList
-    PreferencesPanel, Slider, DivergenceSlider
-    RecommendPanel, RecommendView, ResultCard, ScoreBreakdown, ErrorMessage
-    YouTubePlayer
-    StudyView, StudyCard
+    Lcd                   display strip: ticker, search field, scanning, ERR, link readout
+    SeedRack, AlbumArt    five slots with cover art, drag or arrow keys to reorder, EJECT
+    SearchDeck            results under the LCD and the MANUAL fallback
+    Fader, FaderBank      SIMILARITY, DISCOVERY, STRICTNESS with readouts and the BYPASS lamp
+    PlayButton            the illuminated PLAY key
+    Tray, DetailPanel     the sliding CD tray and the second display behind DETAIL
+    ScoreBreakdown, YouTubePlayer
+    StudyView, StudyCard  consent, sequence picker, three trays with rating keypads
 ```
-
-## Playback
-
-The player uses YouTube's keyless search-list embed
-(`https://www.youtube.com/embed?listType=search&list=<artist title>`), which shows the top search
-results for the artist and title. No API key is needed and no audio is hosted here. The iframe is
-only loaded when the user clicks "Load YouTube player".
-
-## Accessibility
-
-All controls are native buttons, inputs and radios with visible labels or `aria-label`s. Focus is
-moved to the result heading when a recommendation arrives and to the stage heading as the rating
-study progresses. Status text uses live regions. Focus rings use a high-contrast colour, and
-`prefers-reduced-motion` disables transitions and smooth scrolling. The layout works down to 400px.

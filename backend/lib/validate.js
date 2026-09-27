@@ -10,7 +10,7 @@ function isName(value) {
   return typeof value === 'string' && value.trim().length > 0 && value.length <= MAX_NAME_LENGTH;
 }
 
-// Out-of-range numbers are clamped rather than rejected, per the API contract
+// Clamp, never reject
 function clamp01(value, fallback) {
   if (value === undefined || value === null) return fallback;
   const n = Number(value);

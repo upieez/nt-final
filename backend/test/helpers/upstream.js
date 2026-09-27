@@ -8,7 +8,7 @@ function fixture(relativePath) {
   return JSON.parse(fs.readFileSync(path.join(FIXTURES, relativePath), 'utf8'));
 }
 
-// Matches a Last.fm call by method plus any subset of query params, case-insensitively
+// Match Last.fm method and params
 function lastfm(method, match, reply, status = 200) {
   return nock('https://ws.audioscrobbler.com')
     .get('/2.0/')

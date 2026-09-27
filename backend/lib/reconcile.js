@@ -16,7 +16,7 @@ function stripDiacritics(value) {
   return value.normalize('NFKD').replace(COMBINING_MARKS, '');
 }
 
-// Canonical form used for cross-source matching and de-duplication, never shown to users
+// Canonical form for matching
 function normaliseName(value, { keepThe = false } = {}) {
   if (typeof value !== 'string') return '';
   let name = stripDiacritics(value.toLowerCase());
@@ -48,7 +48,7 @@ function shareIsrc(a, b) {
   return (a || []).some((code) => (b || []).includes(code));
 }
 
-// Picks the best MusicBrainz hit: exact names, then normalised names, in search-score order
+// Best MusicBrainz hit
 function pickByName(recordings, names) {
   for (const rec of recordings) {
     const artistOk = names.some((n) => exactName(rec.artistName, n.artist));
@@ -63,7 +63,7 @@ function pickByName(recordings, names) {
   return null;
 }
 
-// Cross-check: the recording Last.fm points at and the search hit both carry an ISRC
+// ISRC cross-check
 async function pickByIsrc(recordings, lastfmMbid, failures) {
   if (!lastfmMbid || recordings.length === 0) return null;
   const hinted = await musicbrainz.getRecording(lastfmMbid);
@@ -89,6 +89,7 @@ function unresolved(input, info, failures) {
     matchConfidence: 0,
     matchedBy: 'none',
     listeners: info.listeners ?? null,
+    image: info.image ?? null,
     recordingGenres: [],
     failures
   };
@@ -113,7 +114,7 @@ async function findRecording(input, info, failures) {
   return pickByName(search.recordings, names) || pickByIsrc(search.recordings, info.mbid, failures);
 }
 
-// Seeds get the full recording lookup so their ISRCs and MusicBrainz genres are complete
+// Full lookup for seeds only
 async function completeRecording(match, full, failures) {
   if (!full) return match.recording;
   const result = await musicbrainz.getRecording(match.recording.mbid);
@@ -121,7 +122,7 @@ async function completeRecording(match, full, failures) {
   return result.status === 'ok' ? result.recording : match.recording;
 }
 
-// Resolves { artist, title, isrc? } to canonical ids; matchedBy is exact, normalised, isrc or none
+// Resolves a track to ids
 async function resolveTrack(input, { full = false } = {}) {
   http.count('matchAttempted');
   const failures = [];
@@ -142,6 +143,7 @@ async function resolveTrack(input, { full = false } = {}) {
     matchConfidence: Number(match.matchConfidence.toFixed(3)),
     matchedBy: match.matchedBy,
     listeners: info.listeners ?? null,
+    image: info.image ?? null,
     recordingGenres: recording.genres.map((g) => g.name),
     failures
   };
@@ -158,7 +160,7 @@ function emptyArtist(artistMbid) {
   return { mbid: artistMbid, name: null, country: null, genres: [], wikidataId: null, labels: [], members: [], memberOf: [], failures: [] };
 }
 
-// Artist entity = MusicBrainz artist plus Wikidata relations, the inputs to genre and graph signals
+// MusicBrainz artist plus Wikidata
 async function resolveArtist(artistMbid) {
   const entity = emptyArtist(artistMbid);
   if (!artistMbid) return entity;

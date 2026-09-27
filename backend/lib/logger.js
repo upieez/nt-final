@@ -1,4 +1,4 @@
-// One line per request: method, path, status and latency, the only console output in normal operation
+// One log line per request
 function requestLogger(req, res, next) {
   const startedAt = process.hrtime.bigint();
   res.on('finish', () => {

@@ -4,7 +4,7 @@ const { normaliseName } = require('../../lib/reconcile');
 
 const NOT_FOUND = { error: 6, message: 'Track not found', links: [] };
 
-// A small self-consistent universe: post-punk seeds, gothic neighbours and one pop outlier
+// Small self-consistent test world
 const ARTISTS = {
   'Joy Division': { mbid: 'mb-jd', country: 'GB', genres: ['post-punk', 'new wave'], wikidataId: 'Q1', labels: ['Factory Records'], members: ['Ian Curtis', 'Peter Hook', 'Bernard Sumner'], tags: [['post-punk', 100], ['new wave', 60], ['80s', 40]], similar: ['New Order', 'Bauhaus'] },
   'The Cure': { mbid: 'mb-cure', country: 'GB', genres: ['post-punk', 'gothic rock', 'new wave'], wikidataId: 'Q2', labels: ['Fiction Records'], members: ['Robert Smith'], tags: [['post-punk', 100], ['gothic rock', 70], ['new wave', 50]], similar: ['Siouxsie and the Banshees', 'Bauhaus'] },
@@ -117,7 +117,7 @@ function wikidataReply(query) {
   return build.wdMbidResult(null);
 }
 
-// Installs persistent interceptors for the whole world; overrides force a body per Last.fm method
+// Installs world interceptors
 function install(overrides = {}) {
   nock('https://ws.audioscrobbler.com').persist().get('/2.0/').query(true).reply((uri) => [200, lastfmReply(Object.fromEntries(new URL(uri, 'https://x').searchParams), overrides)]);
   nock('https://musicbrainz.org').persist().get('/ws/2/recording').query(true).reply((uri) => [200, mbSearchReply(Object.fromEntries(new URL(uri, 'https://x').searchParams))]);

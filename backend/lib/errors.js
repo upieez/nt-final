@@ -14,7 +14,7 @@ function unresolvableError(message, warnings) {
   return new ApiError(422, { error: message, warnings });
 }
 
-// Timeouts map to 504 and any other upstream failure to 502, naming the source that failed
+// Timeout 504, otherwise 502
 function upstreamError(failure) {
   const status = failure.status === 'timeout' ? 504 : 502;
   const error = status === 504 ? `Upstream request to ${failure.source} timed out` : `Upstream request to ${failure.source} failed`;

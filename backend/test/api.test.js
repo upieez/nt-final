@@ -18,7 +18,7 @@ describe('POST /api/v1/recommendations/next-track', () => {
     const res = await post({ sequence: SEQUENCE, preferences: { genreStrictness: 0.5, discoveryFactor: 0.5 }, options: { poolMode: 'dynamic', poolSize: 40, alternatives: 3 } });
     expect(res.status).toBe(200);
     const body = res.body;
-    expect(body.recommendation).toEqual({ artist: 'Siouxsie and the Banshees', title: 'Spellbound', mbid: 'rec-spellbound', wikidataId: 'Q5', listeners: 650000, tags: ['post-punk', 'gothic rock', 'new wave', '80s'] });
+    expect(body.recommendation).toEqual({ artist: 'Siouxsie and the Banshees', title: 'Spellbound', mbid: 'rec-spellbound', wikidataId: 'Q5', listeners: 650000, image: null, tags: ['post-punk', 'gothic rock', 'new wave', '80s'] });
     expect(typeof body.score).toBe('number');
     expect(body.breakdown).toEqual({ tagOverlap: expect.any(Number), genreOverlap: expect.any(Number), graphSignal: expect.any(Number), popularityPenalty: expect.any(Number), recencyWeightApplied: true, divergence: 0, divergenceApplied: false });
     expect(body.explanation.matchedTags).toContain('post-punk');
@@ -26,11 +26,11 @@ describe('POST /api/v1/recommendations/next-track', () => {
     expect(body.explanation.sharedRelations).toContainEqual({ type: 'country', value: 'GB', with: 'The Cure' });
     expect(body.explanation.summary).toBe('Shares post-punk, gothic rock and new wave with your most recent tracks, and has the same country as Joy Division and The Cure.');
     expect(body.alternatives).toHaveLength(3);
-    expect(body.alternatives[0]).toEqual({ artist: expect.any(String), title: expect.any(String), score: expect.any(Number), matchedTags: expect.any(Array) });
+    expect(body.alternatives[0]).toEqual({ artist: expect.any(String), title: expect.any(String), score: expect.any(Number), matchedTags: expect.any(Array), image: null });
     expect(body.candidatePool).toEqual({ mode: 'dynamic', size: 10, scored: 10, scoreless: 0, excluded: 0, contrast: 0 });
     expect(body.seeds).toEqual([
-      { artist: 'Joy Division', title: 'Disorder', resolved: true, mbid: 'rec-disorder', tagSource: 'artist' },
-      { artist: 'The Cure', title: 'A Forest', resolved: true, mbid: 'rec-forest', tagSource: 'track' }
+      { artist: 'Joy Division', title: 'Disorder', resolved: true, mbid: 'rec-disorder', image: null, tagSource: 'artist' },
+      { artist: 'The Cure', title: 'A Forest', resolved: true, mbid: 'rec-forest', image: null, tagSource: 'track' }
     ]);
     expect(body.diagnostics).toEqual({ latencyMs: expect.any(Number), cacheHits: expect.any(Number), cacheMisses: expect.any(Number), upstreamCalls: expect.any(Number), matchRate: 1, enrichmentSkipped: 0 });
     expect(body.warnings).toEqual([{ track: 'Joy Division - Disorder', issue: expect.stringContaining('artist-level tags') }]);

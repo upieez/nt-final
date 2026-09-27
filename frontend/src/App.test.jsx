@@ -3,13 +3,14 @@ import App from './App.jsx';
 
 describe('App shell', () => {
   beforeEach(() => {
-    vi.stubGlobal('fetch', vi.fn(() => Promise.resolve({ ok: true, json: () => Promise.resolve({ status: 'ok', offline: true }) })));
+    vi.stubGlobal('fetch', vi.fn(() => Promise.resolve({ ok: true, status: 200, text: () => Promise.resolve(JSON.stringify({ status: 'ok', offline: true })) })));
   });
 
-  it('states that there is no account and no history', async () => {
+  it('shows the link readout on the LCD and the stateless note on the faceplate', async () => {
     render(<App />);
-    expect(await screen.findByText(/offline mode/)).toBeInTheDocument();
+    expect(await screen.findByText('OFFLINE MODE')).toBeInTheDocument();
     expect(screen.getByText(/no account, no listening history/i)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Rating study' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Study' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Play: find the next track' })).toBeDisabled();
   });
 });

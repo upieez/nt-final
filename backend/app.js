@@ -24,8 +24,8 @@ app.use('/api/v1/study', studyRouter);
 
 app.use((req, res) => res.status(404).json({ error: 'Not found' }));
 
-// Typed errors carry their own status and body; anything else is a 500 without internals
-app.use((err, req, res, next) => {
+// Typed errors, else generic 500
+app.use((err, req, res, _next) => {
   if (err instanceof ApiError) return res.status(err.status).json(err.body);
   if (err.type === 'entity.parse.failed') return res.status(400).json({ error: 'Invalid request', details: ['body must be valid JSON'] });
   if (err.type === 'entity.too.large') return res.status(413).json({ error: 'Request body too large' });
